@@ -1,0 +1,63 @@
+/* src/index.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global variables & base styling */
+:root{
+  --accent: #3B82F6;
+  --silver: #C0C0C0;
+  --text-light: #E5E5E5;
+}
+
+/* Global page layout + gradient background (matches spec) */
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+#root {
+  min-height: 600vh; /* Allow for 6 full sections */
+  margin: 0;
+  padding: 0;
+  max-width: none; /* Remove width constraints */
+}
+
+body {
+  margin: 0;
+  color: var(--text-light);
+  font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  
+  /* Single continuous gradient spanning exactly 600vh (all 6 sections) */
+  background: linear-gradient(180deg, 
+    #000000 0%,     /* Section 1 start: Pure black */
+    #000000 16.66%, /* Section 1 end: Still black */
+    #333333 33.33%, /* Section 2 end: Dark grey */
+    #666666 50%,    /* Section 3 end: Medium grey */
+    #999999 66.66%, /* Section 4 end: Medium grey */
+    #cccccc 83.33%, /* Section 5 end: Light grey */
+    #ffffff 100%    /* Section 6 end: Pure white */
+  );
+  
+  /* Critical: Set exact height to match content */
+  min-height: 600vh;
+  background-size: 100% 600vh;
+  background-repeat: no-repeat;
+  background-attachment: scroll; /* Ensure it scrolls with content */
+}
+
+/* Utility helper for full-section (100vh) sections */
+.section-full {
+  min-height: 100vh;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Keep text readable */
+.text-entropy {
+  color: #E5E5E5;
+}
