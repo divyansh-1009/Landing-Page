@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, useCallback } from 'react'
 import './App.css'
 
 function App() {
@@ -6,6 +6,9 @@ function App() {
   const [selectedRectIndex, setSelectedRectIndex] = useState<number | null>(null)
   const [showText, setShowText] = useState(false)
   const [showSection2Text, setShowSection2Text] = useState(false)
+  const [showSection3, setShowSection3] = useState(false)
+  const [connectedDots, setConnectedDots] = useState<{row: number, col: number}[]>([])
+  const [animationComplete, setAnimationComplete] = useState(false)
   const section1Ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -42,6 +45,85 @@ function App() {
       setShowSection2Text(false)
     }
   }, [scrollY])
+
+  // Check if user is in Section 3 and trigger animation
+  useEffect(() => {
+    const sectionHeight = window.innerHeight
+    const section3Start = sectionHeight * 2 // Section 3 starts after Section 2
+    const section3End = sectionHeight * 3 // Section 3 ends before Section 4
+    
+    if (scrollY >= section3Start && scrollY < section3End) {
+      if (!showSection3) {
+        setShowSection3(true)
+        // Generate random path when entering section 3
+        generateRandomPath()
+      }
+    } else {
+      setShowSection3(false)
+      setConnectedDots([])
+      setAnimationComplete(false)
+    }
+  }, [scrollY, showSection3])
+
+  // Generate random Manhattan path through the grid
+  const generateRandomPath = useCallback(() => {
+    const path: {row: number, col: number}[] = []
+    
+    // Start from random dot in first row (row 0)
+    const startCol = Math.floor(Math.random() * 15)
+    path.push({row: 0, col: startCol})
+    
+    let currentCol = startCol
+    
+    // Stop at random row between 10 and 14 (so > 10)
+    const endRow = Math.floor(Math.random() * 5) + 10 // 10 to 14
+    
+    // Connect to one random dot in each subsequent row using Manhattan distance
+    for (let row = 1; row <= endRow; row++) {
+      // Random target column for this row
+      const targetCol = Math.floor(Math.random() * 15)
+      
+      // Create Manhattan path from current position to target
+      // First move horizontally, then vertically (or vice versa)
+      const moveHorizontalFirst = Math.random() > 0.5
+      
+      if (moveHorizontalFirst) {
+        // Move horizontally first
+        while (currentCol !== targetCol) {
+          currentCol += currentCol < targetCol ? 1 : -1
+          if (path[path.length - 1].row === row - 1) {
+            path.push({row: row - 1, col: currentCol})
+          }
+        }
+        // Then move vertically
+        path.push({row, col: currentCol})
+      } else {
+        // Move vertically first (to current row)
+        path.push({row, col: currentCol})
+        // Then move horizontally if needed
+        while (currentCol !== targetCol) {
+          currentCol += currentCol < targetCol ? 1 : -1
+          path.push({row, col: currentCol})
+        }
+      }
+    }
+    
+    // Animate the path drawing
+    animatePath(path)
+  }, [])
+
+  // Animate the path drawing with delays
+  const animatePath = (path: {row: number, col: number}[]) => {
+    setConnectedDots([])
+    path.forEach((dot, index) => {
+      setTimeout(() => {
+        setConnectedDots(prev => [...prev, dot])
+        if (index === path.length - 1) {
+          setAnimationComplete(true)
+        }
+      }, index * 100) // 100ms delay between each dot
+    })
+  }
 
   const animationProgress = getAnimationProgress()
 
@@ -132,8 +214,76 @@ function App() {
       </section>
       
       <section className="section-full" id="section-3">
-        <h1>Section 3</h1>
-        <p>Dark grey to medium grey</p>
+        {showSection3 && (
+          <>
+            <div className="dots-grid-container">
+              <div className="dots-grid">
+                {Array.from({ length: 15 }, (_, row) =>
+                  Array.from({ length: 15 }, (_, col) => {
+                    const isConnected = connectedDots.some(dot => dot.row === row && dot.col === col)
+                    const isLastDot = animationComplete && 
+                      connectedDots.length > 0 && 
+                      connectedDots[connectedDots.length - 1].row === row && 
+                      connectedDots[connectedDots.length - 1].col === col
+                    
+                    return (
+                      <div
+                        key={`${row}-${col}`}
+                        className={`grid-dot ${isConnected ? 'connected' : ''} ${isLastDot ? 'final-dot' : ''}`}
+                        style={{
+                          gridRow: row + 1,
+                          gridColumn: col + 1,
+                        }}
+                      />
+                    )
+                  })
+                )}
+                
+                {/* Render connection lines */}
+                {connectedDots.length > 1 && connectedDots.map((dot, index) => {
+                  if (index === 0) return null
+                  const prevDot = connectedDots[index - 1]
+                  const isHorizontal = dot.row === prevDot.row
+                  
+                  if (isHorizontal) {
+                    // Horizontal line
+                    const startCol = Math.min(dot.col, prevDot.col)
+                    const length = Math.abs(dot.col - prevDot.col)
+                    return (
+                      <div
+                        key={`line-h-${index}`}
+                        className="grid-line horizontal"
+                        style={{
+                          gridRow: dot.row + 1,
+                          gridColumn: `${startCol + 1} / ${startCol + length + 2}`,
+                        }}
+                      />
+                    )
+                  } else {
+                    // Vertical line
+                    const startRow = Math.min(dot.row, prevDot.row)
+                    const length = Math.abs(dot.row - prevDot.row)
+                    return (
+                      <div
+                        key={`line-v-${index}`}
+                        className="grid-line vertical"
+                        style={{
+                          gridRow: `${startRow + 1} / ${startRow + length + 2}`,
+                          gridColumn: dot.col + 1,
+                        }}
+                      />
+                    )
+                  }
+                })}
+              </div>
+            </div>
+            
+            <div className="section-3-text">
+              <p>I map the hidden connections of markets.</p>
+              <p>I trace the patterns others overlook.</p>
+            </div>
+          </>
+        )}
       </section>
       
       <section className="section-full" id="section-4">

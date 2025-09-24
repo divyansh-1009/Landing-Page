@@ -188,3 +188,172 @@
     font-size: 2rem;
   }
 }
+
+/* Section 3 - Dots Grid Animation */
+.dots-grid-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 3rem;
+  margin-top: 8rem;
+}
+
+.dots-grid {
+  display: grid;
+  grid-template-columns: repeat(15, 20px);
+  grid-template-rows: repeat(15, 20px);
+  gap: 10px;
+  position: relative;
+  padding: 2rem;
+}
+
+.grid-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #666;
+  border-radius: 50%;
+  position: relative;
+  transition: all 0.3s ease;
+  opacity: 0.4;
+}
+
+.grid-dot.connected {
+  background-color: #ffffff;
+  opacity: 1;
+  box-shadow: 0 0 8px rgba(255, 255, 255, 0.6);
+  animation: dotConnect 0.3s ease-in-out;
+}
+
+.grid-dot.final-dot {
+  animation: radarGlow 2s ease-in-out infinite;
+  background-color: #00ff88;
+  box-shadow: 0 0 20px rgba(0, 255, 136, 0.8);
+}
+
+.grid-line {
+  background-color: #ffffff;
+  position: relative;
+  z-index: 1;
+}
+
+.grid-line.horizontal {
+  height: 2px;
+  align-self: center;
+  animation: lineGrow 0.3s ease-in-out;
+}
+
+.grid-line.vertical {
+  width: 2px;
+  justify-self: center;
+  animation: lineGrow 0.3s ease-in-out;
+}
+
+.section-3-text {
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.section-3-text p {
+  font-size: 1.8rem;
+  font-weight: 500;
+  color: #ffffff;
+  margin: 1rem 0;
+  line-height: 1.4;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  animation: section3TextFadeIn 1s ease-in-out forwards;
+  opacity: 0;
+}
+
+.section-3-text p:nth-child(1) {
+  animation-delay: 0.5s;
+}
+
+.section-3-text p:nth-child(2) {
+  animation-delay: 0.8s;
+}
+
+@keyframes dotConnect {
+  from {
+    transform: scale(0.5);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes radarGlow {
+  0%, 100% {
+    box-shadow: 
+      0 0 20px rgba(0, 255, 136, 0.8),
+      0 0 40px rgba(0, 255, 136, 0.4),
+      0 0 60px rgba(0, 255, 136, 0.2);
+    transform: scale(1);
+  }
+  50% {
+    box-shadow: 
+      0 0 30px rgba(0, 255, 136, 1),
+      0 0 60px rgba(0, 255, 136, 0.6),
+      0 0 100px rgba(0, 255, 136, 0.3);
+    transform: scale(1.2);
+  }
+}
+
+@keyframes lineGrow {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes section3TextFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .dots-grid {
+    grid-template-columns: repeat(15, 15px);
+    grid-template-rows: repeat(15, 15px);
+    gap: 8px;
+  }
+  
+  .grid-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .section-3-text p {
+    font-size: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dots-grid {
+    grid-template-columns: repeat(15, 12px);
+    grid-template-rows: repeat(15, 12px);
+    gap: 6px;
+    padding: 1rem;
+  }
+  
+  .grid-dot {
+    width: 4px;
+    height: 4px;
+  }
+  
+  .section-3-text p {
+    font-size: 1.3rem;
+  }
+}
