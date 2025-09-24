@@ -5,6 +5,7 @@ function App() {
   const [scrollY, setScrollY] = useState(0)
   const [selectedRectIndex, setSelectedRectIndex] = useState<number | null>(null)
   const [showText, setShowText] = useState(false)
+  const [showSection2Text, setShowSection2Text] = useState(false)
   const section1Ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
@@ -28,6 +29,19 @@ function App() {
     const progress = Math.min(scrollY / (sectionHeight * 0.5), 1) // Complete animation at 50% of section height
     return progress
   }
+
+  // Check if user is in Section 2
+  useEffect(() => {
+    const sectionHeight = window.innerHeight
+    const section2Start = sectionHeight // Section 2 starts after Section 1
+    const section2End = sectionHeight * 2 // Section 2 ends before Section 3
+    
+    if (scrollY >= section2Start && scrollY < section2End) {
+      setShowSection2Text(true)
+    } else {
+      setShowSection2Text(false)
+    }
+  }, [scrollY])
 
   const animationProgress = getAnimationProgress()
 
@@ -110,8 +124,11 @@ function App() {
       </section>
       
       <section className="section-full" id="section-2">
-        <h1>Section 2</h1>
-        <p>Black to dark grey transition</p>
+        {showSection2Text && (
+          <div className="section-2-content">
+            <h2 className="section-2-text">Among billions of possibilities, I recognize yours.</h2>
+          </div>
+        )}
       </section>
       
       <section className="section-full" id="section-3">
