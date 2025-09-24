@@ -16,6 +16,107 @@
   box-sizing: border-box;
 }
 
+/* Section 1 - Rectangles Animation */
+#section-1 {
+  background: #000000;
+  padding: 0;
+  overflow: hidden;
+}
+
+.rectangles-container {
+  position: absolute;
+  top: 70%;
+  left: 0;
+  width: 100vw;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: stretch;
+  padding: 0;
+  margin: 0;
+  transform: translateY(-50%);
+}
+
+.rectangle {
+  height: 80px;
+  width: calc(100vw / 20);
+  margin: 0;
+  animation: fadeIn 1s ease-in-out forwards;
+  opacity: 0;
+  transition: all 0.2s ease-out;
+  transform-origin: left center;
+  position: relative;
+  flex-shrink: 0;
+}
+
+.rectangle.selected {
+  transition: all 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Stagger the fade-in animation */
+.rectangle:nth-child(1) { animation-delay: 0.1s; }
+.rectangle:nth-child(2) { animation-delay: 0.15s; }
+.rectangle:nth-child(3) { animation-delay: 0.2s; }
+.rectangle:nth-child(4) { animation-delay: 0.25s; }
+.rectangle:nth-child(5) { animation-delay: 0.3s; }
+.rectangle:nth-child(6) { animation-delay: 0.35s; }
+.rectangle:nth-child(7) { animation-delay: 0.4s; }
+.rectangle:nth-child(8) { animation-delay: 0.45s; }
+.rectangle:nth-child(9) { animation-delay: 0.5s; }
+.rectangle:nth-child(10) { animation-delay: 0.55s; }
+.rectangle:nth-child(11) { animation-delay: 0.6s; }
+.rectangle:nth-child(12) { animation-delay: 0.65s; }
+.rectangle:nth-child(13) { animation-delay: 0.7s; }
+.rectangle:nth-child(14) { animation-delay: 0.75s; }
+.rectangle:nth-child(15) { animation-delay: 0.8s; }
+.rectangle:nth-child(16) { animation-delay: 0.85s; }
+.rectangle:nth-child(17) { animation-delay: 0.9s; }
+.rectangle:nth-child(18) { animation-delay: 0.95s; }
+.rectangle:nth-child(19) { animation-delay: 1s; }
+.rectangle:nth-child(20) { animation-delay: 1.05s; }
+
+.overlay-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #ffffff;
+  font-size: 2.5rem;
+  font-weight: 600;
+  z-index: 20;
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
+  animation: textFadeIn 1s ease-in-out forwards;
+  opacity: 0;
+}
+
+.overlay-text p {
+  margin: 0.5rem 0;
+  line-height: 1.2;
+}
+
+@keyframes textFadeIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
 .section-full h1 {
   font-size: 4rem;
   margin: 0 0 1rem 0;
