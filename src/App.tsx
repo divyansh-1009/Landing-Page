@@ -34,7 +34,14 @@ function App() {
   // Section 4 states
   const [section4Progress, setSection4Progress] = useState(0)
   // Carry-forward duration threshold for highlighted dot (slows transition)
-  const CARRY_THRESHOLD = 0.85
+  const CARRY_THRESHOLD = 0.95
+  // Base and target scales
+  const BASE_SECTION3_SCALE = 1.8
+  const TARGET_SECTION4_SCALE = BASE_SECTION3_SCALE * 4 // 4x section 3 size
+  // Post-handoff slow growth (delta scale added after 1s delay)
+  const POST_DELAY_GROWTH_MAX = TARGET_SECTION4_SCALE - BASE_SECTION3_SCALE
+  const [growthDelayPassed, setGrowthDelayPassed] = useState(false)
+  const growthDelayTimerRef = useRef<number | null>(null)
   
   // Section 5 states
   const [section5Progress, setSection5Progress] = useState(0)
@@ -165,8 +172,8 @@ function App() {
     if (section4Ref.current) {
       const rect4 = section4Ref.current.getBoundingClientRect()
       const viewportH = window.innerHeight
-      const startTrigger4 = viewportH * 0.9 // start earlier (near bottom)
-      const endTrigger4 = viewportH * 0.3   // finish sooner (upper third)
+      const startTrigger4 = viewportH * 0.98 // start very early (near bottom)
+      const endTrigger4 = viewportH * 0.1    // finish later (near top)
       const distance4 = Math.max(1, startTrigger4 - endTrigger4)
       const rawProgress4 = (startTrigger4 - rect4.top) / distance4
       const progress4 = Math.min(1, Math.max(0, rawProgress4))
@@ -196,6 +203,31 @@ function App() {
       }
     }
   }, [scrollY, fullPath])
+
+  // Manage the 1s delay after carry completes before enabling growth
+  useEffect(() => {
+    if (section4Progress >= CARRY_THRESHOLD) {
+      if (!growthDelayPassed && growthDelayTimerRef.current === null) {
+        growthDelayTimerRef.current = window.setTimeout(() => {
+          setGrowthDelayPassed(true)
+          growthDelayTimerRef.current = null
+        }, 1000)
+      }
+    } else {
+      // Reset if user scrolls back before/into carry phase
+      setGrowthDelayPassed(false)
+      if (growthDelayTimerRef.current !== null) {
+        window.clearTimeout(growthDelayTimerRef.current)
+        growthDelayTimerRef.current = null
+      }
+    }
+    return () => {
+      if (growthDelayTimerRef.current !== null) {
+        window.clearTimeout(growthDelayTimerRef.current)
+        growthDelayTimerRef.current = null
+      }
+    }
+  }, [section4Progress])
 
   // Initialize selected rectangle
   useEffect(() => {
@@ -459,6 +491,22 @@ function App() {
                 const currentX = startX + (centerX - startX) * section4Progress
                 const currentY = startY + (centerY - startY) * section4Progress
 
+                // Base size matches section 3 highlighted dot scale
+                const baseScale = BASE_SECTION3_SCALE
+                const growthLocal = growthDelayPassed
+                  ? Math.min(1, Math.max(0, (section4Progress - CARRY_THRESHOLD) / (1 - CARRY_THRESHOLD)))
+                  : 0
+                const unifiedScale = baseScale + POST_DELAY_GROWTH_MAX * growthLocal
+
+                // Gradually transition the glow from carry end (white/soft blue) to fuller blue
+                const blueR = 59
+                const blueG = 130
+                const blueB = 246
+                const glow1 = `0 0 ${Math.round(30 + 20 * growthLocal)}px rgba(${blueR}, ${blueG}, ${blueB}, ${0.85 + 0.05 * growthLocal})`
+                const glow2 = `0 0 ${Math.round(60 + 40 * growthLocal)}px rgba(${blueR}, ${blueG}, ${blueB}, ${0.65 + 0.05 * growthLocal})`
+                const glow3 = `0 0 ${Math.round(100 + 50 * growthLocal)}px rgba(${blueR}, ${blueG}, ${blueB}, ${0.45 + 0.05 * growthLocal})`
+                const dynamicShadow = `${glow1}, ${glow2}, ${glow3}`
+
                 return (
                   <div key={`s4-${dot.id}`}>
                     <div
@@ -467,9 +515,13 @@ function App() {
                         position: 'absolute',
                         left: `${currentX}px`,
                         top: `${currentY}px`,
-                        transform: `translate(-50%, -50%) scale(${1 + section4Progress * 3})`,
+                        transform: `translate(-50%, -50%) scale(${unifiedScale})`,
                         opacity: 1,
                         zIndex: 10,
+                        animation: 'none',
+                        boxShadow: dynamicShadow,
+                        width: '8px',
+                        height: '8px',
                       }}
                     />
                   </div>
@@ -519,14 +571,32 @@ function App() {
         const s4CenterY = s4Rect.top + (s4Grid.clientHeight / 2)
 
         const t = Math.min(1, Math.max(0, section4Progress / CARRY_THRESHOLD))
-        const easeInOut = t < 0.5 ? (2 * t * t) : (1 - Math.pow(-2 * t + 2, 2) / 2)
+        // Smootherstep easing for more consistent velocity
+        const easeInOut = (t * t * t) * (t * (t * 6 - 15) + 10)
 
         const curX = s3StartX + (s4CenterX - s3StartX) * easeInOut
         const curY = s3StartY + (s4CenterY - s3StartY) * easeInOut
 
-        const startScale = 1.8
-        const endScale = 1 + (CARRY_THRESHOLD * 3) // match scale progression at carry end
-        const scale = startScale + (endScale - startScale) * easeInOut
+        // Keep carry dot size identical to section 3 highlighted dot
+        const scale = BASE_SECTION3_SCALE
+
+        // Gradual color/glow transition for carry dot (grey/white -> blue)
+        const lerp = (a: number, b: number, u: number) => a + (b - a) * u
+        const clamp01 = (v: number) => Math.min(1, Math.max(0, v))
+        const colorU = clamp01(easeInOut)
+        const grey = 153 // #999 baseline
+        const white = 255
+        const c = Math.round(lerp(grey, white, colorU))
+        const bgColor = `rgb(${c}, ${c}, ${c})`
+        // Blend white glow towards blue glow
+        const blueGlowU = colorU
+        const blueR = Math.round(lerp(255, 59, blueGlowU))
+        const blueG = Math.round(lerp(255, 130, blueGlowU))
+        const blueB = Math.round(lerp(255, 246, blueGlowU))
+        const glow1 = `0 0 ${Math.round(lerp(20, 30, blueGlowU))}px rgba(${blueR}, ${blueG}, ${blueB}, ${lerp(0.8, 0.9, blueGlowU)})`
+        const glow2 = `0 0 ${Math.round(lerp(40, 60, blueGlowU))}px rgba(${blueR}, ${blueG}, ${blueB}, ${lerp(0.6, 0.7, blueGlowU)})`
+        const glow3 = `0 0 ${Math.round(lerp(60, 100, blueGlowU))}px rgba(${blueR}, ${blueG}, ${blueB}, ${lerp(0.4, 0.5, blueGlowU)})`
+        const boxShadow = `${glow1}, ${glow2}, ${glow3}`
 
         return (
           <div
@@ -537,6 +607,8 @@ function App() {
               top: `${curY}px`,
               transform: `translate(-50%, -50%) scale(${scale})`,
               zIndex: 100,
+              backgroundColor: bgColor,
+              boxShadow,
             }}
           />
         )
