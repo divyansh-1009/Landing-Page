@@ -685,10 +685,10 @@ function App() {
       
       <section className="section-full" id="section-5" ref={section5Ref}>
         <div className="section-5-container">
-          {/* Central dot - transforms from blue to gray during convergence */}
+          {/* Central dot - stays visible permanently, no fading */}
           {!carry4to5Active && section5Progress > 0 && (
             <div 
-              className={`central-dot expanding blue ${convergenceActive ? 'converging' : ''}`}
+              className="central-dot expanding blue"
               style={{
                 transform: `scale(${TARGET_SECTION4_SCALE})`,
                 zIndex: 10,
