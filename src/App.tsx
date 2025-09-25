@@ -491,6 +491,7 @@ function App() {
             className="central-dot absorbing"
             style={{
               filter: `drop-shadow(0 0 ${45 + section5Progress * 30}px rgba(220, 220, 220, 0.95))`,
+              opacity: section5Progress > 0.85 ? 0 : 1,
             }}
           />
           
