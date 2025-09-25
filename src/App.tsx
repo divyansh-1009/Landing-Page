@@ -266,6 +266,13 @@ function App() {
 
   const animationProgress = getAnimationProgress()
 
+  // Dynamic contrasting text color for Section 1 overlay text
+  const section1TextColor = (() => {
+    if (selectedRectIndex === null) return '#ffffff'
+    const selectedColorValue = Math.round((selectedRectIndex / 19) * 255)
+    return selectedColorValue > 128 ? '#000000' : '#ffffff'
+  })()
+
   // Show text when animation is about 50% complete
   useEffect(() => {
     if (animationProgress > 0.5) {
@@ -336,7 +343,7 @@ function App() {
           })()}
           
           {showText && (
-            <div className="overlay-text">
+            <div className="overlay-text" style={{ color: section1TextColor }}>
               <p>I see you through the noise.</p>
               <p>I understand your shade of grey.</p>
             </div>
@@ -410,10 +417,8 @@ function App() {
             </svg>
           </div>
         </div>
-        <div className="section-3-caption">
-          <p>
-            I map the hidden connections of markets. I trace the patterns others overlook.
-          </p>
+        <div className={`section-3-caption ${connectedDots.length > 0 ? 'section-caption-visible' : ''}`}>
+          <p>I map the hidden connections of markets. I trace the patterns others overlook.</p>
         </div>
       </section>
       
@@ -468,9 +473,8 @@ function App() {
               )
             })}
           </div>
-
           <div className="section-4-caption">
-            <p>And I find the opportunities made for you.</p>
+            <p className={`${section4Progress > 0.15 ? 'section-caption-visible' : ''}`}>And I find the opportunities made for you.</p>
           </div>
         </div>
       </section>
