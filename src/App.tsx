@@ -46,6 +46,10 @@ function App() {
   // Section 5 states
   const [section5Progress, setSection5Progress] = useState(0)
   const [smallDots, setSmallDots] = useState<Array<{ id: number, angle: number, color: string, absorbed: boolean }>>([])
+  const [absorptionStarted, setAbsorptionStarted] = useState(false)
+  const [absorptionProgress, setAbsorptionProgress] = useState(0)
+  const absorptionTimerRef = useRef<number | null>(null)
+  const absorptionAnimationRef = useRef<number | null>(null)
   // Carry active flag between Section 4 and 5
   const carry4to5Active = section5Progress > 0 && section5Progress < CARRY_THRESHOLD
   
@@ -145,8 +149,6 @@ function App() {
 
   // Track section progress based on scroll
   useEffect(() => {
-    const sectionHeight = window.innerHeight
-
     // Section 3 progress - Reveal begins BEFORE section enters viewport
     if (section3Ref.current && fullPath.length > 0) {
       const rect = section3Ref.current.getBoundingClientRect()
@@ -193,18 +195,22 @@ function App() {
       const progress5 = Math.min(1, Math.max(0, rawProgress5))
       setSection5Progress(progress5)
 
-      if (progress5 > 0.3) {
+      if (absorptionStarted) {
+        // Start absorbing dots gradually with staggered timing
         setSmallDots(prev => 
           prev.map((dot, index) => ({
             ...dot,
-            absorbed: progress5 > (0.3 + (index * 0.02))
+            absorbed: absorptionProgress > (index * 0.03) // Stagger absorption based on index
           }))
         )
       } else if (progress5 === 0) {
+        // Reset when section is not active
         setSmallDots(prev => prev.map(dot => ({ ...dot, absorbed: false })))
+        setAbsorptionStarted(false)
+        setAbsorptionProgress(0)
       }
     }
-  }, [scrollY, fullPath])
+  }, [scrollY, fullPath, absorptionStarted, absorptionProgress])
 
   // Manage the 1s delay after carry completes before enabling growth
   useEffect(() => {
@@ -229,7 +235,58 @@ function App() {
         growthDelayTimerRef.current = null
       }
     }
-  }, [section4Progress])
+  }, [section4Progress, growthDelayPassed])
+
+  // Handle 1-second delay before absorption starts in section 5
+  useEffect(() => {
+    // Clear any existing timers
+    if (absorptionTimerRef.current) {
+      clearTimeout(absorptionTimerRef.current)
+      absorptionTimerRef.current = null
+    }
+    if (absorptionAnimationRef.current) {
+      clearInterval(absorptionAnimationRef.current)
+      absorptionAnimationRef.current = null
+    }
+
+    // Check if central dot is visible (when carry is not active)
+    const centralDotVisible = !carry4to5Active && section5Progress > 0
+
+    if (centralDotVisible && !absorptionStarted) {
+      // Start 1-second timer
+      absorptionTimerRef.current = window.setTimeout(() => {
+        setAbsorptionStarted(true)
+        // Start absorption animation
+        let progress = 0
+        absorptionAnimationRef.current = window.setInterval(() => {
+          progress += 0.05 // Increment by 5% each frame
+          setAbsorptionProgress(progress)
+          if (progress >= 1) {
+            if (absorptionAnimationRef.current) {
+              clearInterval(absorptionAnimationRef.current)
+              absorptionAnimationRef.current = null
+            }
+          }
+        }, 50) // 50ms intervals for smooth animation
+        absorptionTimerRef.current = null
+      }, 1000) // Changed from 2000 to 1000 milliseconds
+    } else if (!centralDotVisible) {
+      // Reset if we scroll back or section is not active
+      setAbsorptionStarted(false)
+      setAbsorptionProgress(0)
+    }
+
+    return () => {
+      if (absorptionTimerRef.current) {
+        clearTimeout(absorptionTimerRef.current)
+        absorptionTimerRef.current = null
+      }
+      if (absorptionAnimationRef.current) {
+        clearInterval(absorptionAnimationRef.current)
+        absorptionAnimationRef.current = null
+      }
+    }
+  }, [carry4to5Active, section5Progress, absorptionStarted])
 
   // Initialize selected rectangle
   useEffect(() => {
@@ -662,13 +719,31 @@ function App() {
       
       <section className="section-full" id="section-5" ref={section5Ref}>
         <div className="section-5-container">
-          <div 
-            className="central-dot absorbing"
-            style={{
-              filter: `drop-shadow(0 0 ${45 + section5Progress * 30}px rgba(220, 220, 220, 0.95))`,
-              opacity: carry4to5Active ? 0 : (section5Progress > 0.85 ? 0 : 1),
-            }}
-          />
+          {/* Show stationary blue dot during delay period (after carry finishes, before absorption starts) */}
+          {!carry4to5Active && !absorptionStarted && section5Progress > 0 && (
+            <div 
+              className="central-dot expanding blue stationary"
+              style={{
+                transform: `scale(${TARGET_SECTION4_SCALE})`,
+                zIndex: 10,
+                width: '8px',
+                height: '8px',
+                borderRadius: '50%',
+                position: 'relative'
+              }}
+            />
+          )}
+          
+          {/* Show absorbing gray dot during absorption phase */}
+          {absorptionStarted && (
+            <div 
+              className="central-dot absorbing"
+              style={{
+                filter: `drop-shadow(0 0 ${45 + section5Progress * 30}px rgba(220, 220, 220, 0.95))`,
+                opacity: section5Progress > 0.85 ? 0 : 1,
+              }}
+            />
+          )}
           
           <div className="small-dots-circle">
             {smallDots.map((smallDot) => {
@@ -693,12 +768,6 @@ function App() {
               )
             })}
           </div>
-
-          {section5Progress > 0.85 && (
-            <div className="section-5-content">
-              <h2 className="section-5-text">Amongst the entropy, I found your perfect business opportunity, backed by my proprietary intense market research and reasoning.</h2>
-            </div>
-          )}
         </div>
       </section>
       
