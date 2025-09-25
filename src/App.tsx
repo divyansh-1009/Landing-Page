@@ -55,6 +55,8 @@ function App() {
   const section3Ref = useRef<HTMLElement>(null)
   const typedElementRef = useRef<HTMLDivElement>(null)
   const typedInstanceRef = useRef<Typed | null>(null)
+  const section4GridRef = useRef<HTMLDivElement>(null)
+  const section4Ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -155,12 +157,16 @@ function App() {
       }
     }
     
-    // Section 4 progress
-    const section4Start = sectionHeight * 3
-    const section4End = sectionHeight * 4
-    if (scrollY >= section4Start && scrollY < section4End) {
-      const progress = Math.min((scrollY - section4Start) / (section4End - section4Start), 1)
-      setSection4Progress(progress)
+    // Section 4 progress - Begin movement before entering viewport
+    if (section4Ref.current) {
+      const rect4 = section4Ref.current.getBoundingClientRect()
+      const viewportH = window.innerHeight
+      const startTrigger4 = viewportH * 0.9 // start earlier (near bottom)
+      const endTrigger4 = viewportH * 0.3   // finish sooner (upper third)
+      const distance4 = Math.max(1, startTrigger4 - endTrigger4)
+      const rawProgress4 = (startTrigger4 - rect4.top) / distance4
+      const progress4 = Math.min(1, Math.max(0, rawProgress4))
+      setSection4Progress(progress4)
     }
     
     // Section 5 progress
@@ -411,30 +417,44 @@ function App() {
         </div>
       </section>
       
-      <section className="section-full" id="section-4">
+      <section className="section-full" id="section-4" ref={section4Ref}>
         <div className="section-4-container">
-          {/* All dots from section 3, with the highlighted one expanding */}
-          <div className="dots-grid-section-4">
+          {/* All dots from section 3, with the highlighted one moving to center */}
+          <div className="dots-grid-section-4" ref={section4GridRef}>
             {dots.map((dot) => {
               const isHighlighted = highlightedDot?.row === dot.row && highlightedDot?.col === dot.col
               const wasConnected = fullPath.includes(dot.row * 15 + dot.col)
-              
+
               if (isHighlighted) {
+                // Compute movement from original grid position to center based on progress
+                const gridW = section4GridRef.current?.clientWidth ?? 450
+                const gridH = section4GridRef.current?.clientHeight ?? 450
+                const cellW = gridW / 15
+                const cellH = gridH / 15
+                const startX = (dot.col + 0.5) * cellW
+                const startY = (dot.row + 0.5) * cellH
+                const centerX = gridW / 2
+                const centerY = gridH / 2
+                const currentX = startX + (centerX - startX) * section4Progress
+                const currentY = startY + (centerY - startY) * section4Progress
+
                 return (
-                  <div
-                    key={`s4-${dot.id}`}
-                    className="central-dot expanding"
-                    style={{
-                      gridRow: dot.row + 1,
-                      gridColumn: dot.col + 1,
-                      transform: `scale(${1 + section4Progress * 3})`,
-                      opacity: 1,
-                      zIndex: 10,
-                    }}
-                  />
+                  <div key={`s4-${dot.id}`}>
+                    <div
+                      className="central-dot expanding blue"
+                      style={{
+                        position: 'absolute',
+                        left: `${currentX}px`,
+                        top: `${currentY}px`,
+                        transform: `translate(-50%, -50%) scale(${1 + section4Progress * 3})`,
+                        opacity: 1,
+                        zIndex: 10,
+                      }}
+                    />
+                  </div>
                 )
               }
-              
+
               return (
                 <div
                   key={`s4-${dot.id}`}
@@ -442,11 +462,15 @@ function App() {
                   style={{
                     gridRow: dot.row + 1,
                     gridColumn: dot.col + 1,
-                    opacity: Math.max(0, 0.6 - section4Progress * 0.6),
+                    opacity: Math.max(0, 1 - section4Progress * 1),
                   }}
                 />
               )
             })}
+          </div>
+
+          <div className="section-4-caption">
+            <p>And I find the opportunities made for you.</p>
           </div>
         </div>
       </section>
