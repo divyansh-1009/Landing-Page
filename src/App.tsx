@@ -46,6 +46,8 @@ function App() {
   // Section 5 states
   const [section5Progress, setSection5Progress] = useState(0)
   const [smallDots, setSmallDots] = useState<Array<{ id: number, angle: number, color: string, absorbed: boolean }>>([])
+  // Carry active flag between Section 4 and 5
+  const carry4to5Active = section5Progress > 0 && section5Progress < CARRY_THRESHOLD
   
   // Section 6 states
   const [formSteps, setFormSteps] = useState<FormStep[]>([
@@ -211,7 +213,7 @@ function App() {
         growthDelayTimerRef.current = window.setTimeout(() => {
           setGrowthDelayPassed(true)
           growthDelayTimerRef.current = null
-        }, 1000)
+        }, 100)
       }
     } else {
       // Reset if user scrolls back before/into carry phase
@@ -478,7 +480,7 @@ function App() {
               const wasConnected = fullPath.includes(dot.row * 15 + dot.col)
               const carryActive = section4Progress > 0 && section4Progress < CARRY_THRESHOLD
 
-              if (isHighlighted && !carryActive) {
+              if (isHighlighted && !carryActive && !carry4to5Active) {
                 // Compute movement from original grid position to center based on progress
                 const gridW = section4GridRef.current?.clientWidth ?? 450
                 const gridH = section4GridRef.current?.clientHeight ?? 450
@@ -613,6 +615,50 @@ function App() {
           />
         )
       })()}
+
+      {/* Carry-forward overlay dot between Section 4 and 5 for seamless handoff */}
+      {(() => {
+        const s4Grid = section4GridRef.current
+        const s5El = section5Ref.current
+        if (!s4Grid || !s5El) return null
+        if (!carry4to5Active) return null
+
+        const s4Rect = s4Grid.getBoundingClientRect()
+        const s5Rect = s5El.getBoundingClientRect()
+
+        // Section 4 start position (center of grid in viewport coords)
+        const s4StartX = s4Rect.left + (s4Grid.clientWidth / 2)
+        const s4StartY = s4Rect.top + (s4Grid.clientHeight / 2)
+
+        // Section 5 target position (center of section)
+        const s5CenterX = s5Rect.left + (s5Rect.width / 2)
+        const s5CenterY = s5Rect.top + (s5Rect.height / 2)
+
+        const tRaw = Math.min(1, Math.max(0, section5Progress / CARRY_THRESHOLD))
+        const t = (tRaw * tRaw * tRaw) * (tRaw * (tRaw * 6 - 15) + 10) // smootherstep
+
+        const curX = s4StartX + (s5CenterX - s4StartX) * t
+        const curY = s4StartY + (s5CenterY - s4StartY) * t
+
+        // Keep the exact same appearance as section 4's central dot (no color changes)
+        const scale = TARGET_SECTION4_SCALE
+
+        return (
+          <div
+            className="central-dot expanding blue carry-dot"
+            style={{
+              position: 'fixed',
+              left: `${curX}px`,
+              top: `${curY}px`,
+              transform: `translate(-50%, -50%) scale(${scale})`,
+              zIndex: 100,
+              width: '8px',
+              height: '8px',
+              borderRadius: '50%'
+            }}
+          />
+        )
+      })()}
       
       <section className="section-full" id="section-5" ref={section5Ref}>
         <div className="section-5-container">
@@ -620,7 +666,7 @@ function App() {
             className="central-dot absorbing"
             style={{
               filter: `drop-shadow(0 0 ${45 + section5Progress * 30}px rgba(220, 220, 220, 0.95))`,
-              opacity: section5Progress > 0.85 ? 0 : 1,
+              opacity: carry4to5Active ? 0 : (section5Progress > 0.85 ? 0 : 1),
             }}
           />
           
