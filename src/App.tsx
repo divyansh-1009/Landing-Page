@@ -33,6 +33,8 @@ function App() {
   
   // Section 4 states
   const [section4Progress, setSection4Progress] = useState(0)
+  // Carry-forward duration threshold for highlighted dot (slows transition)
+  const CARRY_THRESHOLD = 0.85
   
   // Section 5 states
   const [section5Progress, setSection5Progress] = useState(0)
@@ -53,6 +55,7 @@ function App() {
   
   const section1Ref = useRef<HTMLElement>(null)
   const section3Ref = useRef<HTMLElement>(null)
+  const section3GridRef = useRef<HTMLDivElement>(null)
   const typedElementRef = useRef<HTMLDivElement>(null)
   const typedInstanceRef = useRef<Typed | null>(null)
   const section4GridRef = useRef<HTMLDivElement>(null)
@@ -367,11 +370,17 @@ function App() {
       
       <section className="section-full" id="section-3" ref={section3Ref}>
         <div className="dots-grid-container">
-          <div className="dots-grid">
+          <div className="dots-grid" ref={section3GridRef}>
             {dots.map((dot) => {
               const isConnected = connectedDots.includes(dot.row * 15 + dot.col)
               const isHighlighted = highlightedDot?.row === dot.row && highlightedDot?.col === dot.col
+              const carryActive = section4Progress > 0 && section4Progress < CARRY_THRESHOLD
               
+              // Hide the highlighted dot when the carry-over overlay is active to avoid duplicates
+              if (isHighlighted && carryActive) {
+                return null
+              }
+
               return (
                 <div
                   key={dot.id}
@@ -435,8 +444,9 @@ function App() {
             {dots.map((dot) => {
               const isHighlighted = highlightedDot?.row === dot.row && highlightedDot?.col === dot.col
               const wasConnected = fullPath.includes(dot.row * 15 + dot.col)
+              const carryActive = section4Progress > 0 && section4Progress < CARRY_THRESHOLD
 
-              if (isHighlighted) {
+              if (isHighlighted && !carryActive) {
                 // Compute movement from original grid position to center based on progress
                 const gridW = section4GridRef.current?.clientWidth ?? 450
                 const gridH = section4GridRef.current?.clientHeight ?? 450
@@ -484,6 +494,53 @@ function App() {
           </div>
         </div>
       </section>
+
+      {/* Carry-forward overlay dot between Section 3 and 4 for seamless handoff */}
+      {(() => {
+        if (!highlightedDot) return null
+        const carryActive = section4Progress > 0 && section4Progress < CARRY_THRESHOLD
+        if (!carryActive) return null
+
+        const s3Grid = section3GridRef.current
+        const s4Grid = section4GridRef.current
+        if (!s3Grid || !s4Grid) return null
+
+        const s3Rect = s3Grid.getBoundingClientRect()
+        const s4Rect = s4Grid.getBoundingClientRect()
+
+        // Section 3 start position (viewport coords)
+        const s3CellW = (s3Grid.clientWidth || 450) / 15
+        const s3CellH = (s3Grid.clientHeight || 450) / 15
+        const s3StartX = s3Rect.left + (highlightedDot.col + 0.5) * s3CellW
+        const s3StartY = s3Rect.top + (highlightedDot.row + 0.5) * s3CellH
+
+        // Section 4 target center (viewport coords)
+        const s4CenterX = s4Rect.left + (s4Grid.clientWidth / 2)
+        const s4CenterY = s4Rect.top + (s4Grid.clientHeight / 2)
+
+        const t = Math.min(1, Math.max(0, section4Progress / CARRY_THRESHOLD))
+        const easeInOut = t < 0.5 ? (2 * t * t) : (1 - Math.pow(-2 * t + 2, 2) / 2)
+
+        const curX = s3StartX + (s4CenterX - s3StartX) * easeInOut
+        const curY = s3StartY + (s4CenterY - s3StartY) * easeInOut
+
+        const startScale = 1.8
+        const endScale = 1 + (CARRY_THRESHOLD * 3) // match scale progression at carry end
+        const scale = startScale + (endScale - startScale) * easeInOut
+
+        return (
+          <div
+            className="carry-dot"
+            style={{
+              position: 'fixed',
+              left: `${curX}px`,
+              top: `${curY}px`,
+              transform: `translate(-50%, -50%) scale(${scale})`,
+              zIndex: 100,
+            }}
+          />
+        )
+      })()}
       
       <section className="section-full" id="section-5" ref={section5Ref}>
         <div className="section-5-container">
