@@ -437,9 +437,10 @@
   height: 24px;
   background-color: #888;
   border-radius: 50%;
-  animation: grayPulse 1.5s infinite ease-in-out;
+  animation: grayPulse 1.4s infinite ease-in-out;
   position: relative;
   z-index: 10;
+  box-shadow: 0 0 45px rgba(220, 220, 220, 0.85), 0 0 90px rgba(220, 220, 220, 0.55);
 }
 
 @keyframes grayPulse {
@@ -466,6 +467,26 @@
   border-radius: 50%;
   transition: all 1s ease-out;
   transform-origin: center;
+}
+
+.section-5-content {
+  position: absolute;
+  top: 65%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 90%;
+  max-width: 900px;
+  text-align: center;
+}
+
+.section-5-text {
+  font-size: 1.6rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  line-height: 1.4;
+  animation: section2TextFadeIn 1s ease-in-out forwards;
+  opacity: 0;
 }
 
 /* Section 6 - Form Morphing Styles */

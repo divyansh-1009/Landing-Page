@@ -57,6 +57,7 @@ function App() {
   const typedInstanceRef = useRef<Typed | null>(null)
   const section4GridRef = useRef<HTMLDivElement>(null)
   const section4Ref = useRef<HTMLElement>(null)
+  const section5Ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -169,21 +170,26 @@ function App() {
       setSection4Progress(progress4)
     }
     
-    // Section 5 progress
-    const section5Start = sectionHeight * 4
-    const section5End = sectionHeight * 5
-    if (scrollY >= section5Start && scrollY < section5End) {
-      const progress = Math.min((scrollY - section5Start) / (section5End - section5Start), 1)
-      setSection5Progress(progress)
-      
-      // Absorb small dots progressively
-      if (progress > 0.3) {
+    // Section 5 progress - begin before entering viewport (early trigger)
+    if (section5Ref.current) {
+      const rect5 = section5Ref.current.getBoundingClientRect()
+      const viewportH = window.innerHeight
+      const startTrigger5 = viewportH * 0.95
+      const endTrigger5 = viewportH * 0.3
+      const distance5 = Math.max(1, startTrigger5 - endTrigger5)
+      const rawProgress5 = (startTrigger5 - rect5.top) / distance5
+      const progress5 = Math.min(1, Math.max(0, rawProgress5))
+      setSection5Progress(progress5)
+
+      if (progress5 > 0.3) {
         setSmallDots(prev => 
           prev.map((dot, index) => ({
             ...dot,
-            absorbed: progress > (0.3 + (index * 0.02))
+            absorbed: progress5 > (0.3 + (index * 0.02))
           }))
         )
+      } else if (progress5 === 0) {
+        setSmallDots(prev => prev.map(dot => ({ ...dot, absorbed: false })))
       }
     }
   }, [scrollY, fullPath])
@@ -479,18 +485,21 @@ function App() {
         </div>
       </section>
       
-      <section className="section-full" id="section-5">
+      <section className="section-full" id="section-5" ref={section5Ref}>
         <div className="section-5-container">
           <div 
             className="central-dot absorbing"
             style={{
-              filter: `drop-shadow(0 0 ${20 + section5Progress * 10}px rgba(128, 128, 128, 0.8))`,
+              filter: `drop-shadow(0 0 ${45 + section5Progress * 30}px rgba(220, 220, 220, 0.95))`,
             }}
           />
           
           <div className="small-dots-circle">
             {smallDots.map((smallDot) => {
-              const radius = 150 - (smallDot.absorbed ? section5Progress * 140 : 0)
+              const eased = section5Progress < 0.5
+                ? (section5Progress * section5Progress * 2)
+                : (1 - Math.pow(1 - section5Progress, 2))
+              const radius = 150 - (smallDot.absorbed ? eased * 140 : 0)
               const x = Math.cos((smallDot.angle * Math.PI) / 180) * radius
               const y = Math.sin((smallDot.angle * Math.PI) / 180) * radius
               
@@ -499,14 +508,21 @@ function App() {
                   key={smallDot.id}
                   className="small-dot"
                   style={{
-                    transform: `translate(${x}px, ${y}px) scale(${smallDot.absorbed ? 0.1 : 1})`,
-                    opacity: smallDot.absorbed ? 0 : 1,
-                    boxShadow: `0 0 10px ${smallDot.color}`,
+                    transform: `translate(${x}px, ${y}px) scale(${smallDot.absorbed ? 0.2 : 1})`,
+                    opacity: smallDot.absorbed ? 0.1 : 1,
+                    boxShadow: `0 0 ${22 + eased * 32}px ${smallDot.color}, 0 0 ${44 + eased * 48}px ${smallDot.color}, 0 0 ${28 + eased * 40}px rgba(255, 255, 255, 0.35)`,
+                    filter: `saturate(${1.6}) brightness(${1.35})`,
                   }}
                 />
               )
             })}
           </div>
+
+          {section5Progress > 0.85 && (
+            <div className="section-5-content">
+              <h2 className="section-5-text">Amongst the entropy, I found your perfect business opportunity, backed by my proprietary intense market research and reasoning.</h2>
+            </div>
+          )}
         </div>
       </section>
       
