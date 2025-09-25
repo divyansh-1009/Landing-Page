@@ -52,6 +52,7 @@ function App() {
   const [formInputValue, setFormInputValue] = useState("")
   
   const section1Ref = useRef<HTMLElement>(null)
+  const section3Ref = useRef<HTMLElement>(null)
   const typedElementRef = useRef<HTMLDivElement>(null)
   const typedInstanceRef = useRef<Typed | null>(null)
 
@@ -130,18 +131,28 @@ function App() {
   // Track section progress based on scroll
   useEffect(() => {
     const sectionHeight = window.innerHeight
-    
-    // Section 3 progress - Progressive path reveal
-    const section3Start = sectionHeight * 2
-    const section3End = sectionHeight * 3
-    if (scrollY >= section3Start && scrollY < section3End && fullPath.length > 0) {
-      const progress = Math.min((scrollY - section3Start) / (section3End - section3Start), 1)
-      const visibleDotsCount = Math.floor(progress * fullPath.length)
-      setConnectedDots(fullPath.slice(0, Math.max(1, visibleDotsCount))) // Always show at least first dot
-    } else if (scrollY < section3Start) {
-      setConnectedDots([]) // Reset when scrolling back up
-    } else if (scrollY >= section3End) {
-      setConnectedDots(fullPath) // Show complete path when past section 3
+
+    // Section 3 progress - Reveal begins BEFORE section enters viewport
+    if (section3Ref.current && fullPath.length > 0) {
+      const rect = section3Ref.current.getBoundingClientRect()
+      const viewportH = window.innerHeight
+
+      // Start revealing when the top of section 3 is at 80% of viewport height
+      // Finish revealing when the top reaches 20% of viewport height
+      const startTrigger = viewportH * 0.8
+      const endTrigger = viewportH * 0.2
+      const distance = Math.max(1, startTrigger - endTrigger)
+      const rawProgress = (startTrigger - rect.top) / distance
+      const progress = Math.min(1, Math.max(0, rawProgress))
+
+      if (progress <= 0) {
+        setConnectedDots([])
+      } else if (progress >= 1) {
+        setConnectedDots(fullPath)
+      } else {
+        const visibleDotsCount = Math.floor(progress * fullPath.length)
+        setConnectedDots(fullPath.slice(0, Math.max(1, visibleDotsCount))) // Always show at least first dot
+      }
     }
     
     // Section 4 progress
@@ -335,7 +346,7 @@ function App() {
         )}
       </section>
       
-      <section className="section-full" id="section-3">
+      <section className="section-full" id="section-3" ref={section3Ref}>
         <div className="dots-grid-container">
           <div className="dots-grid">
             {dots.map((dot) => {
@@ -392,6 +403,11 @@ function App() {
               })}
             </svg>
           </div>
+        </div>
+        <div className="section-3-caption">
+          <p>
+            I map the hidden connections of markets. I trace the patterns others overlook.
+          </p>
         </div>
       </section>
       

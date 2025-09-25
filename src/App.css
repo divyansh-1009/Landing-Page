@@ -337,25 +337,23 @@
   background-color: #fff;
   border-radius: 50%;
   box-shadow: 
-    0 0 30px rgba(59, 130, 246, 0.8),
-    0 0 60px rgba(59, 130, 246, 0.6);
-  animation: bluePulse 2s infinite ease-in-out;
+    0 0 20px rgba(255, 255, 255, 0.8),
+    0 0 40px rgba(255, 255, 255, 0.6),
+    0 0 60px rgba(255, 255, 255, 0.4);
+  animation: radarPulse 2s infinite ease-in-out;
   justify-self: center;
   align-self: center;
   transition: all 0.3s ease-out;
 }
 
-@keyframes bluePulse {
-  0%, 100% {
-    box-shadow: 
-      0 0 30px rgba(59, 130, 246, 0.8),
-      0 0 60px rgba(59, 130, 246, 0.6);
-  }
-  50% {
-    box-shadow: 
-      0 0 50px rgba(59, 130, 246, 1),
-      0 0 100px rgba(59, 130, 246, 0.8);
-  }
+.section-3-caption {
+  margin-top: 24px;
+  max-width: 720px;
+  text-align: center;
+  color: #e5e5e5;
+  opacity: 0.9;
+  line-height: 1.5;
+  font-size: 1.25rem;
 }
 
 /* Section 5 - Gravitational Convergence Styles */
