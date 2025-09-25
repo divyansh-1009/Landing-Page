@@ -46,10 +46,7 @@ function App() {
   // Section 5 states
   const [section5Progress, setSection5Progress] = useState(0)
   const [smallDots, setSmallDots] = useState<Array<{ id: number, angle: number, color: string, absorbed: boolean }>>([])
-  const [absorptionStarted, setAbsorptionStarted] = useState(false)
-  const [absorptionProgress, setAbsorptionProgress] = useState(0)
-  const absorptionTimerRef = useRef<number | null>(null)
-  const absorptionAnimationRef = useRef<number | null>(null)
+  const [convergenceActive, setConvergenceActive] = useState(false)
   // Carry active flag between Section 4 and 5
   const carry4to5Active = section5Progress > 0 && section5Progress < CARRY_THRESHOLD
   
@@ -137,7 +134,14 @@ function App() {
 
   // Initialize small dots for section 5
   useEffect(() => {
-    const colors = ['#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316']
+    const colors = [
+      '#3b82f6', '#10b981', '#ef4444', '#f59e0b', '#8b5cf6', 
+      '#06b6d4', '#84cc16', '#f97316', '#ec4899', '#6366f1',
+      '#14b8a6', '#f43f5e', '#eab308', '#a855f7', '#0ea5e9',
+      '#22c55e', '#f97316', '#ef4444', '#8b5cf6', '#06b6d4',
+      '#84cc16', '#f59e0b', '#3b82f6', '#10b981', '#ef4444',
+      '#f59e0b', '#8b5cf6', '#06b6d4', '#84cc16', '#f97316'
+    ]
     const newSmallDots = Array.from({ length: 30 }, (_, i) => ({
       id: i,
       angle: (i * 360 / 30),
@@ -194,23 +198,8 @@ function App() {
       const rawProgress5 = (startTrigger5 - rect5.top) / distance5
       const progress5 = Math.min(1, Math.max(0, rawProgress5))
       setSection5Progress(progress5)
-
-      if (absorptionStarted) {
-        // Start absorbing dots gradually with staggered timing
-        setSmallDots(prev => 
-          prev.map((dot, index) => ({
-            ...dot,
-            absorbed: absorptionProgress > (index * 0.03) // Stagger absorption based on index
-          }))
-        )
-      } else if (progress5 === 0) {
-        // Reset when section is not active
-        setSmallDots(prev => prev.map(dot => ({ ...dot, absorbed: false })))
-        setAbsorptionStarted(false)
-        setAbsorptionProgress(0)
-      }
     }
-  }, [scrollY, fullPath, absorptionStarted, absorptionProgress])
+  }, [scrollY, fullPath])
 
   // Manage the 1s delay after carry completes before enabling growth
   useEffect(() => {
@@ -237,56 +226,33 @@ function App() {
     }
   }, [section4Progress, growthDelayPassed])
 
-  // Handle 1-second delay before absorption starts in section 5
+  // Simple scroll-based convergence trigger for Section 5
   useEffect(() => {
-    // Clear any existing timers
-    if (absorptionTimerRef.current) {
-      clearTimeout(absorptionTimerRef.current)
-      absorptionTimerRef.current = null
-    }
-    if (absorptionAnimationRef.current) {
-      clearInterval(absorptionAnimationRef.current)
-      absorptionAnimationRef.current = null
-    }
+    if (!section5Ref.current) return
 
-    // Check if central dot is visible (when carry is not active)
-    const centralDotVisible = !carry4to5Active && section5Progress > 0
-
-    if (centralDotVisible && !absorptionStarted) {
-      // Start 1-second timer
-      absorptionTimerRef.current = window.setTimeout(() => {
-        setAbsorptionStarted(true)
-        // Start absorption animation
-        let progress = 0
-        absorptionAnimationRef.current = window.setInterval(() => {
-          progress += 0.05 // Increment by 5% each frame
-          setAbsorptionProgress(progress)
-          if (progress >= 1) {
-            if (absorptionAnimationRef.current) {
-              clearInterval(absorptionAnimationRef.current)
-              absorptionAnimationRef.current = null
-            }
-          }
-        }, 50) // 50ms intervals for smooth animation
-        absorptionTimerRef.current = null
-      }, 1000) // Changed from 2000 to 1000 milliseconds
-    } else if (!centralDotVisible) {
-      // Reset if we scroll back or section is not active
-      setAbsorptionStarted(false)
-      setAbsorptionProgress(0)
-    }
-
-    return () => {
-      if (absorptionTimerRef.current) {
-        clearTimeout(absorptionTimerRef.current)
-        absorptionTimerRef.current = null
-      }
-      if (absorptionAnimationRef.current) {
-        clearInterval(absorptionAnimationRef.current)
-        absorptionAnimationRef.current = null
+    const handleScroll = () => {
+      const rect = section5Ref.current!.getBoundingClientRect()
+      const viewportH = window.innerHeight
+      
+      // Start convergence when section is 90% visible and carry is complete
+      const startTrigger = viewportH * 0.1
+      const isSectionActive = rect.top <= startTrigger && rect.bottom >= 0
+      const shouldStartConvergence = isSectionActive && !carry4to5Active
+      
+      if (shouldStartConvergence && !convergenceActive) {
+        console.log('Starting convergence animation')
+        setConvergenceActive(true)
+      } else if (!isSectionActive && convergenceActive) {
+        console.log('Stopping convergence animation')
+        setConvergenceActive(false)
       }
     }
-  }, [carry4to5Active, section5Progress, absorptionStarted])
+
+    window.addEventListener('scroll', handleScroll)
+    handleScroll() // Check initial state
+    
+    return () => window.removeEventListener('scroll', handleScroll)
+  }, [carry4to5Active, convergenceActive])
 
   // Initialize selected rectangle
   useEffect(() => {
@@ -719,10 +685,10 @@ function App() {
       
       <section className="section-full" id="section-5" ref={section5Ref}>
         <div className="section-5-container">
-          {/* Show stationary blue dot during delay period (after carry finishes, before absorption starts) */}
-          {!carry4to5Active && !absorptionStarted && section5Progress > 0 && (
+          {/* Central dot - transforms from blue to gray during convergence */}
+          {!carry4to5Active && section5Progress > 0 && (
             <div 
-              className="central-dot expanding blue stationary"
+              className={`central-dot expanding blue ${convergenceActive ? 'converging' : ''}`}
               style={{
                 transform: `scale(${TARGET_SECTION4_SCALE})`,
                 zIndex: 10,
@@ -734,36 +700,30 @@ function App() {
             />
           )}
           
-          {/* Show absorbing gray dot during absorption phase */}
-          {absorptionStarted && (
-            <div 
-              className="central-dot absorbing"
-              style={{
-                filter: `drop-shadow(0 0 ${45 + section5Progress * 30}px rgba(220, 220, 220, 0.95))`,
-                opacity: section5Progress > 0.85 ? 0 : 1,
-              }}
-            />
-          )}
-          
+          {/* Small dots in circular formation with convergence animation */}
           <div className="small-dots-circle">
-            {smallDots.map((smallDot) => {
-              const eased = section5Progress < 0.5
-                ? (section5Progress * section5Progress * 2)
-                : (1 - Math.pow(1 - section5Progress, 2))
-              const radius = 150 - (smallDot.absorbed ? eased * 140 : 0)
-              const x = Math.cos((smallDot.angle * Math.PI) / 180) * radius
-              const y = Math.sin((smallDot.angle * Math.PI) / 180) * radius
+            {smallDots.map((smallDot, index) => {
+              // Initial position calculation (circular formation)
+              const startRadius = 150
+              const x = Math.cos((smallDot.angle * Math.PI) / 180) * startRadius
+              const y = Math.sin((smallDot.angle * Math.PI) / 180) * startRadius
               
               return (
                 <div
                   key={smallDot.id}
-                  className="small-dot"
+                  className={`small-dot ${convergenceActive ? 'converging' : ''}`}
                   style={{
-                    transform: `translate(${x}px, ${y}px) scale(${smallDot.absorbed ? 0.2 : 1})`,
-                    opacity: smallDot.absorbed ? 0.1 : 1,
-                    boxShadow: `0 0 ${22 + eased * 32}px ${smallDot.color}, 0 0 ${44 + eased * 48}px ${smallDot.color}, 0 0 ${28 + eased * 40}px rgba(255, 255, 255, 0.35)`,
-                    filter: `saturate(${1.6}) brightness(${1.35})`,
-                  }}
+                    '--start-x': `${x}px`,
+                    '--start-y': `${y}px`,
+                    '--delay': `${index * 0.05}s`,
+                    '--duration': `${1.5 + (index * 0.01)}s`,
+                    backgroundColor: '#666666',
+                    boxShadow: `0 0 22px ${smallDot.color}, 0 0 44px ${smallDot.color}, 0 0 28px rgba(255, 255, 255, 0.35)`,
+                    filter: 'saturate(1.6) brightness(1.35)',
+                    transform: `translate(${x}px, ${y}px)`,
+                    opacity: 1,
+                    scale: 1
+                  } as React.CSSProperties}
                 />
               )
             })}

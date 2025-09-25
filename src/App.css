@@ -347,6 +347,15 @@
   transition: all 0.3s ease-out;
 }
 
+/* Central dot convergence transformation */
+.central-dot.converging {
+  background-color: #888888 !important;
+  box-shadow: 
+    0 0 45px rgba(220, 220, 220, 0.85), 
+    0 0 90px rgba(220, 220, 220, 0.55) !important;
+  animation: grayPulse 1.4s infinite ease-in-out !important;
+}
+
 .central-dot.expanding.blue {
   background-color: #ffffff;
 }
@@ -455,12 +464,59 @@
   transition: opacity 0.5s ease;
 }
 
+/* Working small dot styles with convergence animation */
+.small-dot {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background-color: #666;
+  border-radius: 50%;
+  transform-origin: center;
+  will-change: transform, opacity, box-shadow;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition: all 0.1s ease-out;
+}
+
+/* Convergence animation for small dots */
+.small-dot.converging {
+  animation: convergeToCenter var(--duration, 1.5s) ease-in forwards;
+  animation-delay: var(--delay, 0s);
+}
+
+@keyframes convergeToCenter {
+  0% {
+    transform: translate(var(--start-x, 0px), var(--start-y, 0px)) scale(1);
+    opacity: 1;
+  }
+  70% {
+    transform: translate(0px, 0px) scale(0.3);
+    opacity: 0.7;
+  }
+  100% {
+    transform: translate(0px, 0px) scale(0);
+    opacity: 0;
+  }
+}
+
 @keyframes grayPulse {
   0%, 100% {
     transform: scale(1);
   }
   50% {
     transform: scale(0.8);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    filter: drop-shadow(0 0 45px rgba(255, 255, 255, 0.95)) drop-shadow(0 0 90px rgba(255, 255, 255, 0.7));
+  }
+  50% {
+    transform: scale(1.1);
+    filter: drop-shadow(0 0 60px rgba(255, 255, 255, 1)) drop-shadow(0 0 120px rgba(255, 255, 255, 0.8));
   }
 }
 
@@ -471,15 +527,6 @@
   transform: translate(-50%, -50%);
 }
 
-.small-dot {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background-color: #666;
-  border-radius: 50%;
-  transition: all 1s ease-out;
-  transform-origin: center;
-}
 
 .section-5-content {
   position: absolute;
@@ -613,6 +660,21 @@
     grid-template-rows: repeat(15, 20px);
   }
   
+  /* Section 5 responsive adjustments */
+  .small-dots-circle {
+    transform: translate(-50%, -50%) scale(0.8);
+  }
+  
+  .small-dot {
+    width: 6px;
+    height: 6px;
+  }
+  
+  .central-dot.expanding {
+    width: 16px;
+    height: 16px;
+  }
+  
   .form-input {
     width: 250px;
     font-size: 1rem;
@@ -637,6 +699,21 @@
     height: 240px;
     grid-template-columns: repeat(15, 16px);
     grid-template-rows: repeat(15, 16px);
+  }
+  
+  /* Section 5 mobile adjustments */
+  .small-dots-circle {
+    transform: translate(-50%, -50%) scale(0.6);
+  }
+  
+  .small-dot {
+    width: 5px;
+    height: 5px;
+  }
+  
+  .central-dot.expanding {
+    width: 12px;
+    height: 12px;
   }
   
   .form-input {
