@@ -733,6 +733,9 @@ function App() {
       
       <section className="section-full" id="section-6">
         <div className="section-6-container">
+          <div className="section-6-bottom">
+            <span className="section-6-bottom-text">divyansh</span>
+          </div>
           {!showFinalMessage ? (
             <form className="morphed-form" onSubmit={handleFormSubmit}>
               <div className="form-input-container">

@@ -452,6 +452,21 @@
   justify-content: center;
 }
 
+.section-5-bottom {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  transform: translateX(-50%);
+}
+
+.section-5-bottom-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
 .central-dot.absorbing {
   width: 24px;
   height: 24px;
@@ -561,6 +576,19 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
+}
+
+.section-6-bottom {
+  margin-bottom: 300px;
+}
+
+.section-6-bottom-text {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .morphed-form {
