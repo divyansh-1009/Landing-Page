@@ -581,14 +581,30 @@
 
 .section-6-bottom {
   margin-bottom: 300px;
+  text-align: center;
 }
 
 .section-6-bottom-text {
-  font-size: 0.95rem;
+  font-size: 2.2rem;
   font-weight: 600;
   color: #111827;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
+  margin: 0;
+  line-height: 1.3;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  animation: section2TextFadeIn 0.9s ease-in-out forwards;
+  opacity: 0;
+}
+
+@media (max-width: 768px) {
+  .section-6-bottom-text {
+    font-size: 1.6rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-6-bottom-text {
+    font-size: 1.4rem;
+  }
 }
 
 .morphed-form {

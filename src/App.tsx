@@ -71,6 +71,7 @@ function App() {
   const section4GridRef = useRef<HTMLDivElement>(null)
   const section4Ref = useRef<HTMLElement>(null)
   const section5Ref = useRef<HTMLElement>(null)
+  const section6Ref = useRef<HTMLElement>(null)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -80,6 +81,19 @@ function App() {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  // Reveal text in section 6 when user scrolls to it
+  const [showSection6Text, setShowSection6Text] = useState(false)
+  useEffect(() => {
+    const el = section6Ref.current
+    if (!el) return
+    const rect = el.getBoundingClientRect()
+    const viewportH = window.innerHeight
+    const startTrigger = viewportH * 0.85
+    const endTrigger = viewportH * 0.1
+    const isActive = rect.top < startTrigger && rect.bottom > endTrigger
+    setShowSection6Text(isActive)
+  }, [scrollY])
 
   // Initialize dot grid for section 3
   useEffect(() => {
@@ -731,11 +745,14 @@ function App() {
         </div>
       </section>
       
-      <section className="section-full" id="section-6">
+      <section className="section-full" id="section-6" ref={section6Ref}>
         <div className="section-6-container">
-          <div className="section-6-bottom">
-            <span className="section-6-bottom-text">divyansh</span>
-          </div>
+          {showSection6Text && (
+            <div className="section-6-bottom">
+              <span className="section-6-bottom-text">Amongst the entropy, I found your perfect business opportunity, backed by my 
+              proprietary intense market research and reasoning.</span>
+            </div>
+          )}
           {!showFinalMessage ? (
             <form className="morphed-form" onSubmit={handleFormSubmit}>
               <div className="form-input-container">
