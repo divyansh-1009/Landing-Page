@@ -117,13 +117,15 @@ function App() {
       const path: number[] = []
       let currentCol = Math.floor(Math.random() * 15) // Random start in first row
       
-      for (let row = 0; row < 15; row++) {
+      // Ensure the final dot does NOT end in the last row (row 14)
+      for (let row = 0; row < 14; row++) {
         if (row > 10 && Math.random() > 0.7) break // Stop randomly after row 10
         
         const dotIndex = row * 15 + currentCol
         path.push(dotIndex)
         
-        if (row < 14) {
+        // Only move to the next row if we aren't at the enforced last row (13)
+        if (row < 13) {
           // Manhattan distance movement to next row
           const direction = Math.random() > 0.5 ? 1 : -1
           const steps = Math.floor(Math.random() * 3) + 1 // 1-3 steps
@@ -731,9 +733,9 @@ function App() {
                     '--start-y': `${y}px`,
                     '--delay': `${index * 0.05}s`,
                     '--duration': `${1.5 + (index * 0.01)}s`,
-                    backgroundColor: '#666666',
-                    boxShadow: `0 0 22px ${smallDot.color}, 0 0 44px ${smallDot.color}, 0 0 28px rgba(255, 255, 255, 0.35)`,
-                    filter: 'saturate(1.6) brightness(1.35)',
+                    '--dot-color': `${smallDot.color}`,
+                    boxShadow: `0 0 22px ${smallDot.color}, 0 0 44px ${smallDot.color}, 0 0 28px rgba(255, 255, 255, 0.45)`,
+                    filter: 'saturate(1.7) brightness(1.5)',
                     transform: `translate(${x}px, ${y}px)`,
                     opacity: 1,
                     scale: 1

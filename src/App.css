@@ -482,9 +482,13 @@
 /* Working small dot styles with convergence animation */
 .small-dot {
   position: absolute;
-  width: 8px;
-  height: 8px;
-  background-color: #666;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.85) 30%,
+    var(--dot-color, #666) 60%,
+    var(--dot-color, #666) 100%);
   border-radius: 50%;
   transform-origin: center;
   will-change: transform, opacity, box-shadow;
