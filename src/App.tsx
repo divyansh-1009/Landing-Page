@@ -575,7 +575,7 @@ function App() {
         </div>
         
         {/* Step 1-2 Text - Positioned below the grid */}
-        <div className={`section-3-caption ${connectedDots.length > 0 && currentProgress < 0.72 ? 'section-caption-visible' : 'section-caption-hidden'}`}>
+        <div className={`section-3-caption ${connectedDots.length > 0 && currentProgress < 0.25 ? 'section-caption-visible' : 'section-caption-hidden'}`}>
           <p>I map the hidden connections of markets. I trace the patterns others overlook.</p>
         </div>
         
