@@ -49,7 +49,6 @@ function App() {
   const [currentFormStep, setCurrentFormStep] = useState(0)
   const [showFinalMessage, setShowFinalMessage] = useState(false)
   const [formInputValue, setFormInputValue] = useState("")
-  const [showSection4Text, setShowSection4Text] = useState(false)
   
   // Refs
   const section1Ref = useRef<HTMLElement>(null)
@@ -180,147 +179,169 @@ function App() {
     const handleScrollJackingAnimations = (progress: number) => {
       const state = animationStateRef.current
 
-      // Step 1: Reveal path (0 - 0.2)
-      if (progress >= 0 && progress < 0.25) {
-        const pathProgress = progress / 0.25
+      // Helper function to calculate progress within a range
+      const getProgressInRange = (prog: number, start: number, end: number) => {
+        if (prog < start) return 0
+        if (prog > end) return 1
+        return (prog - start) / (end - start)
+      }
+
+      // Step 1: Reveal path (0 - 0.25) - BIDIRECTIONAL
+      const pathProgress = getProgressInRange(progress, 0, 0.25)
+      if (pathProgress > 0) {
         const visibleDotsCount = Math.floor(pathProgress * fullPath.length)
         setConnectedDots(fullPath.slice(0, Math.max(1, visibleDotsCount)))
+        state.pathComplete = pathProgress >= 1
+      } else {
+        setConnectedDots([])
+        state.pathComplete = false
       }
       
-      // Step 2: Path complete, show text (0.25 - 0.35)
-      else if (progress >= 0.25 && progress < 0.35) {
-        if (!state.pathComplete) {
-          setConnectedDots(fullPath)
-          state.pathComplete = true
+      // Step 2: Path complete, show text (0.25 - 0.35) - BIDIRECTIONAL
+      if (progress >= 0.25) {
+        setConnectedDots(fullPath)
+      }
+      
+      // Step 3: Move dot to center and hide grid/text (0.35 - 0.5) - BIDIRECTIONAL
+      const centerProgress = getProgressInRange(progress, 0.35, 0.5)
+      if (centralDotRef.current && highlightedDot && dotsGridRef.current) {
+        const section = mergedSectionRef.current!
+        const sectionRect = section.getBoundingClientRect()
+        const centerX = sectionRect.width / 2
+        const centerY = sectionRect.height / 2
+        
+        // Calculate original dot position
+        const gridRect = dotsGridRef.current.getBoundingClientRect()
+        const sectionLeft = sectionRect.left
+        const sectionTop = sectionRect.top
+        const gridLeft = gridRect.left - sectionLeft
+        const gridTop = gridRect.top - sectionTop
+        
+        const startX = gridLeft + (highlightedDot.col + 0.5) * 30
+        const startY = gridTop + (highlightedDot.row + 0.5) * 30
+        
+        const currentX = startX + (centerX - startX) * centerProgress
+        const currentY = startY + (centerY - startY) * centerProgress
+        
+        centralDotRef.current.style.position = 'absolute'
+        centralDotRef.current.style.left = `${currentX}px`
+        centralDotRef.current.style.top = `${currentY}px`
+        centralDotRef.current.style.transform = 'translate(-50%, -50%) scale(1.8)'
+        centralDotRef.current.style.opacity = centerProgress > 0 ? '1' : '0'
+        
+        // Fade out/in grid and text - REVERSIBLE
+        if (dotsGridRef.current) {
+          dotsGridRef.current.style.opacity = `${1 - centerProgress}`
+        }
+        
+        const captionEl = document.querySelector('.section-3-caption') as HTMLElement
+        if (captionEl) {
+          captionEl.style.opacity = `${1 - centerProgress}`
         }
       }
       
-      // Step 3: Move dot to center and hide grid/text (0.35 - 0.5)
-      else if (progress >= 0.35 && progress < 0.5) {
-        const centerProgress = (progress - 0.35) / 0.15
+      // Step 4: Enlarge dot and show new text (0.5 - 0.65) - BIDIRECTIONAL
+      const enlargeProgress = getProgressInRange(progress, 0.5, 0.65)
+      if (centralDotRef.current) {
+        const scale = 1.8 + (12.6) * enlargeProgress // 1.8 to 14.4
         
-        if (centralDotRef.current && highlightedDot && dotsGridRef.current) {
-          const section = mergedSectionRef.current!
-          const sectionRect = section.getBoundingClientRect()
-          const centerX = sectionRect.width / 2
-          const centerY = sectionRect.height / 2
-          
-          // Calculate original dot position
-          const gridRect = dotsGridRef.current.getBoundingClientRect()
-          const sectionLeft = sectionRect.left
-          const sectionTop = sectionRect.top
-          const gridLeft = gridRect.left - sectionLeft
-          const gridTop = gridRect.top - sectionTop
-          
-          const startX = gridLeft + (highlightedDot.col + 0.5) * 30
-          const startY = gridTop + (highlightedDot.row + 0.5) * 30
-          
-          const currentX = startX + (centerX - startX) * centerProgress
-          const currentY = startY + (centerY - startY) * centerProgress
-          
-          centralDotRef.current.style.position = 'absolute'
-          centralDotRef.current.style.left = `${currentX}px`
-          centralDotRef.current.style.top = `${currentY}px`
-          centralDotRef.current.style.transform = 'translate(-50%, -50%) scale(1.8)'
-          centralDotRef.current.style.opacity = '1'
-          
-          // Fade out grid and text
-          if (dotsGridRef.current) {
-            dotsGridRef.current.style.opacity = `${1 - centerProgress}`
-          }
-          
-          const captionEl = document.querySelector('.section-3-caption') as HTMLElement
-          if (captionEl) {
-            captionEl.style.opacity = `${1 - centerProgress}`
-          }
+        // Create pulsating blue glow that intensifies as the dot enlarges
+        const glowIntensity = enlargeProgress
+        const baseGlow = 20 + (80 * glowIntensity) // 20px to 100px
+        const midGlow = 40 + (120 * glowIntensity) // 40px to 160px  
+        const outerGlow = 60 + (140 * glowIntensity) // 60px to 200px
+        
+        const blueGlow = glowIntensity > 0 ? `
+          0 0 ${baseGlow}px rgba(59, 130, 246, ${0.6 + 0.3 * glowIntensity}),
+          0 0 ${midGlow}px rgba(59, 130, 246, ${0.4 + 0.2 * glowIntensity}),
+          0 0 ${outerGlow}px rgba(59, 130, 246, ${0.2 + 0.2 * glowIntensity}),
+          0 0 ${outerGlow + 50}px rgba(59, 130, 246, ${0.1 + 0.1 * glowIntensity})
+        ` : '0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.4)'
+        
+        centralDotRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`
+        centralDotRef.current.style.boxShadow = blueGlow
+        
+        if (enlargeProgress > 0) {
+          centralDotRef.current.style.animation = `bluePulse ${2 - 0.5 * enlargeProgress}s infinite ease-in-out`
+        } else {
+          centralDotRef.current.style.animation = 'none'
         }
-        
-        state.dotCentered = true
       }
       
-      // Step 4: Enlarge dot and show new text (0.5 - 0.65)
-      else if (progress >= 0.5 && progress < 0.65) {
-        const enlargeProgress = (progress - 0.5) / 0.15
-        
-        if (centralDotRef.current) {
-          const scale = 1.8 + (5.4) * enlargeProgress // 1.8 to 7.2 (4x)
-          centralDotRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`
-        }
-        
-        // Show "And I find the opportunities made for you." text
-        const step4TextEl = document.querySelector('.step-4-text') as HTMLElement
-        if (step4TextEl) {
-          step4TextEl.style.opacity = `${enlargeProgress}`
-        }
-        
-        state.dotEnlarged = true
+      // Show/Hide "And I find the opportunities made for you." text - BIDIRECTIONAL
+      const step4TextEl = document.querySelector('.step-4-text') as HTMLElement
+      
+      // Step 5: Hide text, show colored dots (0.65 - 0.72) - BIDIRECTIONAL
+      const smallDotsProgress = getProgressInRange(progress, 0.65, 0.72)
+      
+      // Handle step 4 text visibility - REVERSIBLE (only show during enlargement, hide during dots phase)
+      if (step4TextEl) {
+        const step4TextOpacity = enlargeProgress > 0 && smallDotsProgress === 0 ? enlargeProgress : 0
+        step4TextEl.style.opacity = `${step4TextOpacity}`
       }
       
-      // Step 5: Hide text, show colored dots (0.65 - 0.75)
-      else if (progress >= 0.65 && progress < 0.75) {
-        const dotsProgress = (progress - 0.65) / 0.1
-        
-        // Hide step 4 text
-        const step4TextEl = document.querySelector('.step-4-text') as HTMLElement
-        if (step4TextEl) {
-          step4TextEl.style.opacity = `${1 - dotsProgress}`
-        }
-        
-        // Show small colored dots
-        if (smallDotsContainerRef.current) {
-          smallDotsContainerRef.current.style.opacity = `${dotsProgress}`
-        }
-        
-        state.smallDotsVisible = true
+      // Show small colored dots - REVERSIBLE
+      if (smallDotsContainerRef.current) {
+        smallDotsContainerRef.current.style.opacity = `${smallDotsProgress}`
       }
       
-      // Step 6: Absorb colored dots into central dot (0.75 - 0.9)
-      else if (progress >= 0.75 && progress < 0.9) {
-        const absorbProgress = (progress - 0.75) / 0.15
+      // Step 6: Absorb colored dots into central dot (0.72 - 0.92) - BIDIRECTIONAL
+      const absorbOverallProgress = getProgressInRange(progress, 0.72, 0.92)
+      
+      // Animate small dots converging to center - REVERSIBLE
+      const smallDotElements = document.querySelectorAll('.small-dot')
+      smallDotElements.forEach((dot, index) => {
+        const delay = index * 0.025
+        const adjustedProgress = Math.max(0, Math.min(1, (absorbOverallProgress - delay) / Math.max(0.15, 1 - delay)))
         
-        // Animate small dots converging to center
-        const smallDotElements = document.querySelectorAll('.small-dot')
-        smallDotElements.forEach((dot, index) => {
-          const delay = index * 0.015
-          const adjustedProgress = Math.max(0, Math.min(1, (absorbProgress - delay) / Math.max(0.1, 1 - delay)))
-          
-          const element = dot as HTMLElement
-          const startXStr = element.style.getPropertyValue('--start-x') || '0px'
-          const startYStr = element.style.getPropertyValue('--start-y') || '0px'
-          const startX = parseFloat(startXStr)
-          const startY = parseFloat(startYStr)
-          
-          // Animate from start position to center (0,0)
-          const currentX = startX * (1 - adjustedProgress)
-          const currentY = startY * (1 - adjustedProgress)
-          const scale = Math.max(0, 1 - adjustedProgress)
-          
-          element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`
-          element.style.opacity = `${Math.max(0, 1 - adjustedProgress)}`
-        })
+        const element = dot as HTMLElement
+        const startXStr = element.style.getPropertyValue('--start-x') || '0px'
+        const startYStr = element.style.getPropertyValue('--start-y') || '0px'
+        const startX = parseFloat(startXStr)
+        const startY = parseFloat(startYStr)
         
-        state.dotsAbsorbed = true
+        // Animate from start position to center (0,0) with easing - REVERSIBLE
+        const easedProgress = adjustedProgress * adjustedProgress * (3 - 2 * adjustedProgress)
+        const currentX = startX * (1 - easedProgress)
+        const currentY = startY * (1 - easedProgress)
+        const scale = Math.max(0, 1 - easedProgress)
+        
+        element.style.transform = `translate(${currentX}px, ${currentY}px) scale(${scale})`
+        element.style.opacity = `${Math.max(0, 1 - easedProgress)}`
+      })
+      
+      // Step 7: Hide central dot, show final text (0.92 - 1) - BIDIRECTIONAL
+      const finalProgress = getProgressInRange(progress, 0.92, 1)
+      
+      // Hide central dot - REVERSIBLE (show when in center/enlarge/dots phases)
+      if (centralDotRef.current) {
+        const shouldShowCentralDot = progress >= 0.35 && progress < 0.92
+        const centralOpacity = shouldShowCentralDot ? 1 : (progress < 0.35 ? 0 : 1 - finalProgress)
+        centralDotRef.current.style.opacity = `${centralOpacity}`
       }
       
-      // Step 7: Hide central dot, show final text (0.9 - 1)
-      else if (progress >= 0.9) {
-        const finalProgress = (progress - 0.9) / 0.1
-        
-        // Hide central dot and small dots
-        if (centralDotRef.current) {
-          centralDotRef.current.style.opacity = `${1 - finalProgress}`
-        }
-        
-        if (smallDotsContainerRef.current) {
-          smallDotsContainerRef.current.style.opacity = `${1 - finalProgress}`
-        }
-        
-        // Show final text
-        const finalTextEl = document.querySelector('.final-section-text') as HTMLElement
-        if (finalTextEl) {
-          finalTextEl.style.opacity = `${finalProgress}`
+      // Handle small dots container visibility - REVERSIBLE
+      if (smallDotsContainerRef.current) {
+        const shouldShowSmallDots = progress >= 0.65 && progress < 0.92
+        if (shouldShowSmallDots) {
+          smallDotsContainerRef.current.style.opacity = `${smallDotsProgress}`
+        } else {
+          smallDotsContainerRef.current.style.opacity = '0'
         }
       }
+      
+      // Show final text - REVERSIBLE
+      const finalTextEl = document.querySelector('.final-section-text') as HTMLElement
+      if (finalTextEl) {
+        finalTextEl.style.opacity = `${finalProgress}`
+      }
+
+      // Update state flags for debugging (optional)
+      state.pathComplete = pathProgress >= 1
+      state.dotCentered = centerProgress > 0
+      state.dotEnlarged = enlargeProgress > 0
+      state.smallDotsVisible = smallDotsProgress > 0
+      state.dotsAbsorbed = absorbOverallProgress >= 1
     }
     
     // Create ScrollTrigger for the merged section with pinning
@@ -352,18 +373,6 @@ function App() {
     } else {
       setShowSection2Text(false)
     }
-  }, [scrollY])
-
-  // Section 4 (form) text visibility
-  useEffect(() => {
-    const el = section4Ref.current
-    if (!el) return
-    const rect = el.getBoundingClientRect()
-    const viewportH = window.innerHeight
-    const startTrigger = viewportH * 0.85
-    const endTrigger = viewportH * 0.1
-    const isActive = rect.top < startTrigger && rect.bottom > endTrigger
-    setShowSection4Text(isActive)
   }, [scrollY])
 
   // Initialize selected rectangle
@@ -611,11 +620,6 @@ function App() {
       
       <section className="section-full" id="section-4" ref={section4Ref}>
         <div className="section-4-container">
-          {showSection4Text && (
-            <div className="section-4-bottom">
-              <span className="section-4-bottom-text">Ready to discover your opportunity?</span>
-            </div>
-          )}
           {!showFinalMessage ? (
             <form className="morphed-form" onSubmit={handleFormSubmit}>
               <div className="form-input-container">
