@@ -182,7 +182,7 @@ function App() {
         const section = mergedSectionRef.current
         const sectionRect = section.getBoundingClientRect()
         const centerX = sectionRect.width / 2
-        const centerY = sectionRect.height / 2
+        const centerY = sectionRect.height * 0.35 // Position at 35% from top for consistency
         
         // We can directly use centerX and centerY values from current state
         
@@ -252,7 +252,7 @@ function App() {
         const section = mergedSectionRef.current!
         const sectionRect = section.getBoundingClientRect()
         const centerX = sectionRect.width / 2
-        const centerY = sectionRect.height / 2
+        const centerY = (sectionRect.height * 0.4) // Position at 35% from top instead of 50%
         
         // Calculate original dot position
         const gridRect = dotsGridRef.current.getBoundingClientRect()
