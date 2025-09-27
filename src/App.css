@@ -912,7 +912,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    top: 40%; /* Moved up from 50% to avoid overlap with rectangles */
     max-height: 25vh; /* Limit height to prevent overflow into rectangles */
   }
 
@@ -929,11 +928,11 @@
     content: none; /* Remove extra space */
   }  /* Adjust rectangle container for mobile */
   .rectangles-container {
-    height: 60px;
+    height: 90px;
   }
   
   .rectangle {
-    height: 60px;
+    height: 90px;
   }
   
   /* Section 5 mobile adjustments */
@@ -1037,7 +1036,6 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    top: 35%; /* Positioned higher in portrait mode */
     max-height: 22vh; /* Limit height more strictly in portrait */
   }
 
@@ -1052,10 +1050,10 @@
     hyphens: auto;
   }  /* Further reduce rectangles height for portrait mode */
   .rectangles-container {
-    height: 50px;
+    height: 75px;
   }
   
   .rectangle {
-    height: 50px;
+    height: 75px;
   }
 }
