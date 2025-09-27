@@ -184,8 +184,7 @@ function App() {
         const centerX = sectionRect.width / 2
         const centerY = sectionRect.height / 2
         
-        // Just get the sections dimensions to find center
-        const gridRect = dotsGridRef.current.getBoundingClientRect()
+        // We can directly use centerX and centerY values from current state
         
         if (currentProgress > 0) {
           // Update central dot position - when already centered, keep it at center
@@ -225,7 +224,12 @@ function App() {
       const pathProgress = getProgressInRange(progress, 0, 0.25)
       if (pathProgress > 0) {
         const visibleDotsCount = Math.floor(pathProgress * fullPath.length)
-        setConnectedDots(fullPath.slice(0, Math.max(1, visibleDotsCount)))
+        // Convert fullPath numbers to {row, col} objects
+        const visiblePath = fullPath.slice(0, Math.max(1, visibleDotsCount)).map(index => ({
+          row: Math.floor(index / 15),
+          col: index % 15
+        }))
+        setConnectedDots(visiblePath)
         state.pathComplete = pathProgress >= 1
       } else {
         setConnectedDots([])
@@ -234,7 +238,12 @@ function App() {
       
       // Step 2: Path complete, show text (0.25 - 0.35) - BIDIRECTIONAL
       if (progress >= 0.25) {
-        setConnectedDots(fullPath)
+        // Convert fullPath numbers to {row, col} objects
+        const formattedPath = fullPath.map(index => ({
+          row: Math.floor(index / 15),
+          col: index % 15
+        }))
+        setConnectedDots(formattedPath)
       }
       
       // Step 3: Move dot to center and hide grid/text (0.35 - 0.5) - BIDIRECTIONAL
@@ -583,7 +592,7 @@ function App() {
         <div className="dots-grid-container">
           <div className="dots-grid" ref={dotsGridRef}>
             {dots.map((dot) => {
-              const isConnected = connectedDots.includes(dot.row * 15 + dot.col)
+              const isConnected = connectedDots.some(d => d.row === dot.row && d.col === dot.col)
               const isHighlighted = highlightedDot?.row === dot.row && highlightedDot?.col === dot.col
               
               return (
@@ -600,14 +609,14 @@ function App() {
             
             {/* Connecting lines */}
             <svg className="connection-lines" viewBox="0 0 450 450">
-              {connectedDots.map((dotIndex, i) => {
+              {connectedDots.map((dot, i) => {
                 if (i === connectedDots.length - 1) return null
                 
-                const currentRow = Math.floor(dotIndex / 15)
-                const currentCol = dotIndex % 15
-                const nextDotIndex = connectedDots[i + 1]
-                const nextRow = Math.floor(nextDotIndex / 15)
-                const nextCol = nextDotIndex % 15
+                const currentRow = dot.row
+                const currentCol = dot.col
+                const nextDot = connectedDots[i + 1]
+                const nextRow = nextDot.row
+                const nextCol = nextDot.col
                 
                 const x1 = currentCol * 30 + 15
                 const y1 = currentRow * 30 + 15

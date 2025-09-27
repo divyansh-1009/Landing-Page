@@ -99,8 +99,9 @@
   text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.8);
   animation: textFadeIn 1s ease-in-out forwards;
   opacity: 0;
-  width: 90%;
-  max-width: 800px;
+  width: 100%; /* Full width */
+  padding: 0 20px; /* Add padding instead of max-width */
+  box-sizing: border-box;
 }
 
 .overlay-text p {
@@ -152,13 +153,14 @@
   top: 45%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 800px;
+  width: 100%;
   text-align: center;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .section-2-text {
-  font-size: 3.5rem;
+  font-size: 2.8rem;
   font-weight: 600;
   color: #ffffff;
   margin: 0;
@@ -229,13 +231,15 @@
   top: 70%;
   left: 50%;
   transform: translateX(-50%);
-  max-width: 800px;
+  width: 100%;
   text-align: center;
   color: #e5e5e5;
   font-size: 1.8rem;
   font-weight: 600;
   opacity: 0;
   z-index: 15;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .step-4-text {
@@ -244,7 +248,7 @@
 
 .final-section-text {
   top: 50%;
-  font-size: 2.2rem;
+  font-size: 1.8rem;
   line-height: 1.4;
 }
 
@@ -441,8 +445,7 @@
   bottom: 150px; /* Position well above the bottom of the section */
   left: 50%;
   transform: translateX(-50%);
-  max-width: 900px;
-  width: 90%;
+  width: 100%;
   text-align: center;
   color: #ffffff; /* Pure white for maximum contrast */
   line-height: 1.6;
@@ -453,7 +456,7 @@
   letter-spacing: 0.8px;
   z-index: 15;
   padding: 20px 30px;
-  border-radius: 12px;
+  box-sizing: border-box;
   transition: opacity 0.8s ease, transform 0.8s ease; /* Add smooth transitions */
 }
 
@@ -474,10 +477,11 @@
   justify-content: center;
   margin-top: 20px;
   padding: 0 16px;
+  box-sizing: border-box;
 }
 
 .section-4-caption p {
-  max-width: 800px;
+  width: 100%;
   text-align: center;
   color: #e5e5e5;
   line-height: 1.5;
@@ -485,6 +489,8 @@
   opacity: 0;
   transform: translateY(30px) scale(0.95);
   transition: opacity 0.5s ease, transform 0.5s ease;
+  padding: 0 10px;
+  box-sizing: border-box;
 }
 
 .section-4-caption p.section-caption-visible {
@@ -622,9 +628,10 @@
   top: 65%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 90%;
-  max-width: 900px;
+  width: 100%;
   text-align: center;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 .section-5-text {
@@ -656,6 +663,7 @@
 .section-6-bottom {
   margin-bottom: 300px;
   text-align: center;
+  width: 100%;
 }
 
 .section-6-bottom-text {
@@ -667,6 +675,9 @@
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
   animation: section2TextFadeIn 0.9s ease-in-out forwards;
   opacity: 0;
+  width: 100%;
+  padding: 0 20px;
+  box-sizing: border-box;
 }
 
 @media (max-width: 768px) {
@@ -742,8 +753,10 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  max-width: 600px;
+  width: 100%;
   text-align: center;
+  padding: 0 15px;
+  box-sizing: border-box;
 }
 
 .typed-message {
@@ -760,6 +773,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
 }
 
 /* Responsive adjustments for new sections */
@@ -825,11 +839,11 @@
 @media (max-width: 480px) {
   /* Reduce spacing between sections */
   .app-container {
-    min-height: 175vh; /* Reduced to 70% of previous value (250vh * 0.7) */
+    min-height: 87.5vh; /* Reduced to 50% of previous value (175vh * 0.5) */
   }
   
   .section-full {
-    min-height: 56vh; /* Reduced to 70% of previous value (80vh * 0.7) */
+    min-height: 28vh; /* Reduced to 50% of previous value (56vh * 0.5) */
     padding: 1rem; /* Less padding */
     margin-bottom: 0; /* Remove any bottom margin */
   }
@@ -840,12 +854,12 @@
   }
   
   #section-3 {
-    margin-top: -7vh; /* Adjusted to 70% of previous value (-10vh * 0.7 = -7vh) */
+    margin-top: -3.5vh; /* Adjusted to 50% of previous value (-7vh * 0.5) */
   }
   
-  /* Further optimize scroll behavior for 70% height */
+  /* Further optimize scroll behavior for 50% height */
   .section-full {
-    height: 56vh; /* Force exact height to 70% of original */
+    height: 28vh; /* Force exact height to 50% of original (56vh * 0.5) */
   }
   
   .dots-grid {
@@ -865,9 +879,9 @@
   /* Mobile view for the overlay text */
   .overlay-text {
     font-size: 1.3rem;
-    width: 90%;
-    max-width: 300px;
+    width: 100%;
     white-space: nowrap; /* Keep text on one line */
+    padding: 0 10px;
   }
   
   .overlay-text p {
@@ -908,11 +922,11 @@
     font-size: 1.1rem; /* Slightly smaller font */
     padding: 10px 16px; /* Reduced padding */
     line-height: 1.3;
-    max-width: 95%;
+    width: 100%;
   }
   
   .dots-grid-container {
-    padding-bottom: 55px; /* Reduced to 70% of previous value (80px * 0.7 ≈ 55px) */
+    padding-bottom: 27px; /* Reduced to 50% of previous value (55px * 0.5) */
   }
   
   /* Reduce margins and padding throughout sections */
@@ -943,7 +957,7 @@
   
   /* Improve vertical flow and reduce gaps between sections */
   .section-full + .section-full {
-    margin-top: -10vh; /* Negative margin to reduce space between consecutive sections */
+    margin-top: -14vh; /* Increased negative margin to further reduce space between consecutive sections */
   }
   
   .merged-section {
@@ -972,18 +986,18 @@
 @media (max-width: 480px) and (orientation: portrait) {
   /* Even more compact for portrait mode */
   .app-container {
-    min-height: 140vh; /* Reduced to 70% of previous value (200vh * 0.7) */
+    min-height: 70vh; /* Reduced to 50% of previous value (140vh * 0.5) */
   }
   
   .section-full {
-    min-height: 45.5vh; /* Reduced to 70% of previous value (65vh * 0.7) */
+    min-height: 22.75vh; /* Reduced to 50% of previous value (45.5vh * 0.5) */
     padding: 0.8rem; /* Minimal padding */
   }
   
   .overlay-text {
-    width: 85%;
-    max-width: 280px;
+    width: 100%;
     font-size: 1.2rem;
+    padding: 0 15px;
   }
   
   /* Make the text appear even more concise for portrait mode */
