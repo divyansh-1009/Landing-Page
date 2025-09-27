@@ -171,6 +171,37 @@ function App() {
     setSmallDots(newSmallDots)
   }, [])
 
+  // Window resize handler
+  useEffect(() => {
+    const handleResize = () => {
+      // Re-run animation calculations on resize
+      if (centralDotRef.current && highlightedDot && dotsGridRef.current && mergedSectionRef.current) {
+        // Force recalculation of dot position
+        const currentProgress = animationStateRef.current.dotCentered ? 0.5 : 0
+        
+        const section = mergedSectionRef.current
+        const sectionRect = section.getBoundingClientRect()
+        const centerX = sectionRect.width / 2
+        const centerY = sectionRect.height / 2
+        
+        // Just get the sections dimensions to find center
+        const gridRect = dotsGridRef.current.getBoundingClientRect()
+        
+        if (currentProgress > 0) {
+          // Update central dot position - when already centered, keep it at center
+          centralDotRef.current.style.left = `${centerX}px`
+          centralDotRef.current.style.top = `${centerY}px`
+        }
+      }
+    }
+    
+    window.addEventListener('resize', handleResize)
+    
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [highlightedDot])
+
   // Main scroll-jacking animation setup
   useEffect(() => {
     if (!mergedSectionRef.current || fullPath.length === 0) return
@@ -221,8 +252,15 @@ function App() {
         const gridLeft = gridRect.left - sectionLeft
         const gridTop = gridRect.top - sectionTop
         
-        const startX = gridLeft + (highlightedDot.col + 0.5) * 30
-        const startY = gridTop + (highlightedDot.row + 0.5) * 30
+        // Get the actual cell size dynamically to fix mobile position calculation
+        const gridWidth = gridRect.width
+        const gridHeight = gridRect.height
+        const cellWidth = gridWidth / 15 // 15 columns in the grid
+        const cellHeight = gridHeight / 15 // 15 rows in the grid
+        
+        // Calculate precise start position using actual cell dimensions
+        const startX = gridLeft + (highlightedDot.col + 0.5) * cellWidth
+        const startY = gridTop + (highlightedDot.row + 0.5) * cellHeight
         
         const currentX = startX + (centerX - startX) * centerProgress
         const currentY = startY + (centerY - startY) * centerProgress
@@ -230,7 +268,12 @@ function App() {
         centralDotRef.current.style.position = 'absolute'
         centralDotRef.current.style.left = `${currentX}px`
         centralDotRef.current.style.top = `${currentY}px`
-        centralDotRef.current.style.transform = 'translate(-50%, -50%) scale(1.8)'
+        
+        // Check if we're on mobile by looking at viewport width
+        const isMobile = window.innerWidth <= 480
+        const mobileScale = isMobile ? 1.5 : 1.8 // Use slightly smaller scale on mobile
+        
+        centralDotRef.current.style.transform = `translate(-50%, -50%) scale(${mobileScale})`
         centralDotRef.current.style.opacity = centerProgress > 0 ? '1' : '0'
         
         // Fade out/in grid and text - REVERSIBLE
@@ -245,19 +288,27 @@ function App() {
       // Step 4: Enlarge dot and show new text (0.5 - 0.65) - BIDIRECTIONAL
       const enlargeProgress = getProgressInRange(progress, 0.5, 0.65)
       if (centralDotRef.current) {
-        const scale = 1.8 + (12.6) * enlargeProgress // 1.8 to 14.4
+        // Check if we're on mobile by looking at viewport width
+        const isMobile = window.innerWidth <= 480
+        const baseDotScale = isMobile ? 1.5 : 1.8 // Smaller base scale on mobile
+        const maxDotScale = isMobile ? 10 : 14.4 // Smaller max scale on mobile
+        const dotScaleRange = maxDotScale - baseDotScale
+        
+        const scale = baseDotScale + (dotScaleRange) * enlargeProgress
         
         // Create pulsating blue glow that intensifies as the dot enlarges
         const glowIntensity = enlargeProgress
-        const baseGlow = 20 + (80 * glowIntensity) // 20px to 100px
-        const midGlow = 40 + (120 * glowIntensity) // 40px to 160px  
-        const outerGlow = 60 + (140 * glowIntensity) // 60px to 200px
+        // Adjust glow size for mobile
+        const glowFactor = isMobile ? 0.7 : 1 // 70% size for mobile
+        const baseGlow = (20 + (80 * glowIntensity)) * glowFactor
+        const midGlow = (40 + (120 * glowIntensity)) * glowFactor
+        const outerGlow = (60 + (140 * glowIntensity)) * glowFactor
         
         const blueGlow = glowIntensity > 0 ? `
           0 0 ${baseGlow}px rgba(59, 130, 246, ${0.6 + 0.3 * glowIntensity}),
           0 0 ${midGlow}px rgba(59, 130, 246, ${0.4 + 0.2 * glowIntensity}),
           0 0 ${outerGlow}px rgba(59, 130, 246, ${0.2 + 0.2 * glowIntensity}),
-          0 0 ${outerGlow + 50}px rgba(59, 130, 246, ${0.1 + 0.1 * glowIntensity})
+          0 0 ${outerGlow + 50 * glowFactor}px rgba(59, 130, 246, ${0.1 + 0.1 * glowIntensity})
         ` : '0 0 20px rgba(255, 255, 255, 0.8), 0 0 40px rgba(255, 255, 255, 0.6), 0 0 60px rgba(255, 255, 255, 0.4)'
         
         centralDotRef.current.style.transform = `translate(-50%, -50%) scale(${scale})`
