@@ -1,6 +1,6 @@
 .app-container {
   position: relative;
-  min-height: 600vh; /* 6 sections × 100vh */
+  min-height: 400vh; /* Reduced from 600vh to 400vh (4 sections total) */
 }
 
 /* Section styling */
@@ -194,10 +194,82 @@
   background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
 }
 
-/* Section 3 - Dot Grid Styles */
-#section-3 {
-  background: linear-gradient(180deg, #1a1a1a 0%, #404040 100%);
+/* Merged Section 3-5 - Scroll-jacking Section */
+.merged-section {
+  background: linear-gradient(180deg, #1a1a1a 0%, #404040 30%, #606060 70%, #808080 100%);
   overflow: hidden;
+  position: relative;
+}
+
+/* Section 3 - Dot Grid Styles (part of merged section) */
+#section-3 {
+  overflow: hidden;
+}
+
+.central-animated-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  background-color: #ffffff;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 
+    0 0 20px rgba(255, 255, 255, 0.8),
+    0 0 40px rgba(255, 255, 255, 0.6),
+    0 0 60px rgba(255, 255, 255, 0.4);
+  z-index: 20;
+}
+
+.scroll-text {
+  position: absolute;
+  top: 70%;
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 800px;
+  text-align: center;
+  color: #e5e5e5;
+  font-size: 1.8rem;
+  font-weight: 600;
+  opacity: 0;
+  z-index: 15;
+}
+
+.step-4-text {
+  top: 75%;
+}
+
+.final-section-text {
+  top: 50%;
+  font-size: 2.2rem;
+  line-height: 1.4;
+}
+
+.small-dots-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 10;
+}
+
+.small-dot {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  background: radial-gradient(circle at 50% 50%,
+    rgba(255, 255, 255, 0.95) 0%,
+    rgba(255, 255, 255, 0.85) 30%,
+    var(--dot-color, #666) 60%,
+    var(--dot-color, #666) 100%);
+  border-radius: 50%;
+  transform-origin: center;
+  will-change: transform, opacity, box-shadow;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  transform-style: preserve-3d;
+  transition: all 0.1s ease-out;
 }
 
 .dots-grid-container {
@@ -291,9 +363,9 @@
   }
 }
 
-/* Section 4 - Expanding Dot Styles */
+/* Section 4 - Form Section (formerly section 6) */
 #section-4 {
-  background: linear-gradient(180deg, #404040 0%, #606060 100%);
+  background: linear-gradient(180deg, #808080 0%, #ffffff 100%);
   overflow: hidden;
 }
 
@@ -302,34 +374,25 @@
   width: 100%;
   height: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   justify-content: center;
+  flex-direction: column;
 }
 
-.dots-grid-section-4 {
-  position: relative;
-  display: grid;
-  grid-template-columns: repeat(15, 30px);
-  grid-template-rows: repeat(15, 30px);
-  gap: 0;
-  width: 450px;
-  height: 450px;
+.section-4-bottom {
+  margin-bottom: 300px;
+  text-align: center;
 }
 
-.section-4-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #666;
-  border-radius: 50%;
-  justify-self: center;
-  align-self: center;
-  transition: opacity 0.6s ease-out;
-}
-
-.section-4-dot.was-connected {
-  background-color: #999;
-  transform: scale(1.2);
+.section-4-bottom-text {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: #111827;
+  margin: 0;
+  line-height: 1.3;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+  animation: section2TextFadeIn 0.9s ease-in-out forwards;
+  opacity: 0;
 }
 
 .central-dot.expanding {
