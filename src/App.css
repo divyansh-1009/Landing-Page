@@ -279,6 +279,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
+  padding-bottom: 180px; /* Increased padding to accommodate larger text box */
 }
 
 .dots-grid {
@@ -434,20 +435,34 @@
   pointer-events: none;
 }
 .section-3-caption {
-  margin-top: 24px;
-  max-width: 720px;
+  position: absolute;
+  bottom: 150px; /* Position well above the bottom of the section */
+  left: 50%;
+  transform: translateX(-50%);
+  max-width: 900px;
+  width: 90%;
   text-align: center;
-  color: #e5e5e5;
-  line-height: 1.5;
-  font-size: 1.25rem;
-  opacity: 0;
-  transform: translateY(30px) scale(0.95);
-  transition: opacity 0.5s ease, transform 0.5s ease;
+  color: #ffffff; /* Pure white for maximum contrast */
+  line-height: 1.6;
+  font-size: 1.5rem;
+  font-weight: 600;
+  opacity: 0; /* Start hidden, let classes control visibility */
+  text-shadow: 2px 2px 12px rgba(0, 0, 0, 0.8); /* Stronger shadow for better readability */
+  letter-spacing: 0.8px;
+  z-index: 15;
+  padding: 20px 30px;
+  border-radius: 12px;
+  transition: opacity 0.8s ease, transform 0.8s ease; /* Add smooth transitions */
 }
 
 .section-caption-visible {
-  opacity: 1;
-  transform: translateY(0) scale(1);
+  opacity: 1 !important; /* Force visibility with !important to override any inline styles */
+  transform: translateX(-50%) scale(1);
+}
+
+.section-caption-hidden {
+  opacity: 0 !important; /* Force hiding with !important */
+  transform: translateX(-50%) scale(0.9);
 }
 
 .section-4-caption {
@@ -488,16 +503,6 @@
       0 0 100px rgba(59, 130, 246, 0.85),
       0 0 150px rgba(59, 130, 246, 0.65);
   }
-}
-
-.section-3-caption {
-  margin-top: 24px;
-  max-width: 720px;
-  text-align: center;
-  color: #e5e5e5;
-  opacity: 0.9;
-  line-height: 1.5;
-  font-size: 1.25rem;
 }
 
 /* Section 5 - Gravitational Convergence Styles */
@@ -825,6 +830,18 @@
   .central-dot.expanding {
     width: 12px;
     height: 12px;
+  }
+  
+  .section-3-caption {
+    bottom: -80px;
+    font-size: 1.2rem;
+    padding: 15px 20px;
+    line-height: 1.5;
+    max-width: 95%;
+  }
+  
+  .dots-grid-container {
+    padding-bottom: 140px;
   }
   
   .form-input {

@@ -33,7 +33,8 @@ function App() {
   // Merged section states
   const [dots, setDots] = useState<Dot[]>([])
   const [fullPath, setFullPath] = useState<number[]>([])
-  const [connectedDots, setConnectedDots] = useState<number[]>([])
+    const [connectedDots, setConnectedDots] = useState<{ row: number; col: number }[]>([])
+  const [currentProgress, setCurrentProgress] = useState<number>(0)
   const [highlightedDot, setHighlightedDot] = useState<{ row: number, col: number } | null>(null)
   const [smallDots, setSmallDots] = useState<Array<{ id: number, angle: number, color: string, absorbed: boolean }>>([])
   
@@ -178,6 +179,9 @@ function App() {
     
     const handleScrollJackingAnimations = (progress: number) => {
       const state = animationStateRef.current
+      
+      // Update current progress state
+      setCurrentProgress(progress)
 
       // Helper function to calculate progress within a range
       const getProgressInRange = (prog: number, start: number, end: number) => {
@@ -234,10 +238,8 @@ function App() {
           dotsGridRef.current.style.opacity = `${1 - centerProgress}`
         }
         
-        const captionEl = document.querySelector('.section-3-caption') as HTMLElement
-        if (captionEl) {
-          captionEl.style.opacity = `${1 - centerProgress}`
-        }
+        // Don't override the section-3-caption opacity with inline styles
+        // Let the CSS classes handle the visibility based on connectedDots length
       }
       
       // Step 4: Enlarge dot and show new text (0.5 - 0.65) - BIDIRECTIONAL
@@ -572,8 +574,8 @@ function App() {
           </div>
         </div>
         
-        {/* Step 1-2 Text */}
-        <div className="section-3-caption">
+        {/* Step 1-2 Text - Positioned below the grid */}
+        <div className={`section-3-caption ${connectedDots.length > 0 && currentProgress < 0.72 ? 'section-caption-visible' : 'section-caption-hidden'}`}>
           <p>I map the hidden connections of markets. I trace the patterns others overlook.</p>
         </div>
         
