@@ -452,7 +452,7 @@ function App() {
       
       typedInstanceRef.current = new Typed(typedElementRef.current, {
         strings: ["Great opportunities await you. Sharpen your blades, now on, we shall fight the market battles rigged for you to win."],
-        typeSpeed: 50,
+        typeSpeed: 40,
         showCursor: false,
         loop: false,
         fadeOut: false,
