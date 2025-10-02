@@ -926,8 +926,9 @@
 
   .overlay-text p:first-child::after {
     content: none; /* Remove extra space */
-  }  /* Adjust rectangle container for mobile */
+  }  /* Adjust rectangle container for mobile - center at 50% height */
   .rectangles-container {
+    top: 50%; /* Center the rectangles vertically in Section 1 */
     height: 90px;
   }
   
@@ -1048,8 +1049,9 @@
     text-align: center;
     word-wrap: break-word;
     hyphens: auto;
-  }  /* Further reduce rectangles height for portrait mode */
+  }  /* Further reduce rectangles height for portrait mode and center them */
   .rectangles-container {
+    top: 50%; /* Center the rectangles vertically in Section 1 for portrait mode */
     height: 75px;
   }
   
