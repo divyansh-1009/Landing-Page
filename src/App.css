@@ -150,7 +150,7 @@
 /* Section 2 - Conditional Text */
 .section-2-content {
   position: absolute;
-  top: 45%;
+  top: 50%; /* Center vertically for better mobile experience */
   left: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
@@ -858,15 +858,29 @@
 }
 
 @media (max-width: 480px) {
-  /* Reduce spacing between sections */
+  /* Optimize for mobile single-scroll sections */
   .app-container {
-    min-height: 87.5vh; /* Reduced to 50% of previous value (175vh * 0.5) */
+    min-height: 400vh; /* Maintain full height for proper scrolling */
   }
   
   .section-full {
-    min-height: 28vh; /* Reduced to 50% of previous value (56vh * 0.5) */
-    padding: 1rem; /* Less padding */
-    margin-bottom: 0; /* Remove any bottom margin */
+    min-height: 100vh; /* Each section takes full viewport height */
+    padding: 1rem;
+    margin-bottom: 0;
+  }
+  
+  /* Specific adjustments for Section 1 */
+  #section-1 {
+    min-height: 100vh;
+    height: 100vh; /* Force exact viewport height */
+    padding: 0;
+  }
+  
+  /* Specific adjustments for Section 2 */
+  #section-2 {
+    min-height: 60vh; /* Reduced to 60% of viewport height */
+    height: 60vh; /* Force exact 60% viewport height */
+    padding: 1rem;
   }
   
   /* Control spacing for GSAP ScrollTrigger */
@@ -875,12 +889,7 @@
   }
   
   #section-3 {
-    margin-top: -3.5vh; /* Adjusted to 50% of previous value (-7vh * 0.5) */
-  }
-  
-  /* Further optimize scroll behavior for 50% height */
-  .section-full {
-    height: 28vh; /* Force exact height to 50% of original (56vh * 0.5) */
+    margin-top: 0; /* Remove negative margin that could cause issues */
   }
   
   .dots-grid {
@@ -912,13 +921,24 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    max-height: 25vh; /* Limit height to prevent overflow into rectangles */
+    max-height: 40vh; /* Increase max height for better mobile experience */
+    top: 50%; /* Center vertically on mobile */
+  }
+  
+  /* Mobile optimization for Section 2 text */
+  .section-2-content {
+    top: 50%; /* Ensure section 2 content is centered on mobile */
+  }
+  
+  .section-2-text {
+    font-size: 1.8rem; /* Slightly larger for better mobile readability */
+    line-height: 1.3; /* Better line spacing for mobile */
   }
 
   .overlay-text p {
     display: block; /* Allow each paragraph to be on separate lines */
     margin: 0.05rem 0; /* Reduced from 0.15rem to bring lines closer */
-    line-height: 1.1; /* Reduced from 1.2 to minimize vertical space */
+    line-height: 1.2; /* Slightly increased for better mobile readability */
     text-align: center;
     word-wrap: break-word; /* Ensure long words wrap */
     hyphens: auto; /* Enable hyphenation for better wrapping */
@@ -926,14 +946,16 @@
 
   .overlay-text p:first-child::after {
     content: none; /* Remove extra space */
-  }  /* Adjust rectangle container for mobile - center at 50% height */
+  }
+  
+  /* Adjust rectangle container for mobile - keep centered */
   .rectangles-container {
     top: 50%; /* Center the rectangles vertically in Section 1 */
-    height: 90px;
+    height: 80px;
   }
   
   .rectangle {
-    height: 90px;
+    height: 80px;
   }
   
   /* Section 5 mobile adjustments */
@@ -1018,44 +1040,71 @@
 
 /* Portrait mode specific adjustments for mobile */
 @media (max-width: 480px) and (orientation: portrait) {
-  /* Even more compact for portrait mode */
+  /* Optimize for portrait mode single-scroll sections */
   .app-container {
-    min-height: 70vh; /* Reduced to 50% of previous value (140vh * 0.5) */
+    min-height: 400vh; /* Maintain full height for proper scrolling */
   }
   
   .section-full {
-    min-height: 22.75vh; /* Reduced to 50% of previous value (45.5vh * 0.5) */
-    padding: 0.8rem; /* Minimal padding */
+    min-height: 100vh; /* Each section takes full viewport height */
+    padding: 0.8rem;
+  }
+  
+  /* Specific adjustments for Section 1 in portrait */
+  #section-1 {
+    min-height: 100vh;
+    height: 100vh; /* Force exact viewport height */
+    padding: 0;
+  }
+  
+  /* Specific adjustments for Section 2 in portrait */
+  #section-2 {
+    min-height: 60vh; /* Reduced to 60% of viewport height */
+    height: 60vh; /* Force exact 60% viewport height */
+    padding: 0.8rem;
   }
   
   .overlay-text {
     width: 100%;
-    font-size: 0.75rem; /* Further reduced for portrait to save space */
+    font-size: 0.8rem; /* Optimized size for portrait mobile */
     padding: 0 15px;
     min-height: 50px; /* Reduced min-height for portrait */
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    max-height: 22vh; /* Limit height more strictly in portrait */
+    max-height: 35vh; /* Increased max height for better content display */
+    top: 45%; /* Position slightly higher in portrait mode */
+  }
+  
+  /* Portrait mode Section 2 text optimization */
+  .section-2-content {
+    top: 50%; /* Keep centered in portrait mode */
+  }
+  
+  .section-2-text {
+    font-size: 1.6rem; /* Optimized for portrait mobile */
+    line-height: 1.25; /* Better spacing for portrait */
   }
 
   /* Make the text wrap properly for portrait mode */
   .overlay-text p:first-child,
   .overlay-text p:last-child {
     display: block; /* Allow paragraphs to stack vertically */
-    margin: 0.02rem 0; /* Even tighter margins for portrait */
-    line-height: 1.05; /* Very tight line height for portrait */
+    margin: 0.04rem 0; /* Optimized margins for portrait */
+    line-height: 1.15; /* Better line height for portrait readability */
     text-align: center;
     word-wrap: break-word;
     hyphens: auto;
-  }  /* Further reduce rectangles height for portrait mode and center them */
+  }
+  
+  /* Optimize rectangles positioning for portrait mode */
   .rectangles-container {
     top: 50%; /* Center the rectangles vertically in Section 1 for portrait mode */
-    height: 75px;
+    height: 70px;
   }
   
   .rectangle {
-    height: 75px;
+    height: 70px;
   }
 }
