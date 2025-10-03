@@ -424,21 +424,8 @@ function App() {
     }
   }, [fullPath, dots, smallDots, highlightedDot])
 
-  // Check if user is in Section 2
-  useEffect(() => {
-    const sectionHeight = window.innerHeight
-    const isMobile = window.innerWidth <= 480
-    
-    // Adjust section 2 start position for mobile to make text appear faster
-    const section2Start = isMobile ? sectionHeight * 0.7 : sectionHeight // Start at 70% of section 1 on mobile
-    const section2End = isMobile ? sectionHeight * 1.6 : sectionHeight * 2 // End adjusted for mobile's 60vh section 2
-    
-    if (scrollY >= section2Start && scrollY < section2End) {
-      setShowSection2Text(true)
-    } else {
-      setShowSection2Text(false)
-    }
-  }, [scrollY])
+  // Section 2 text is now controlled by section 1 animation progress
+  // (removed separate scroll-based logic)
 
   // Initialize selected rectangle
   useEffect(() => {
@@ -514,6 +501,10 @@ function App() {
   useEffect(() => {
     if (animationProgress > 0.5) {
       setShowText(true)
+      // Trigger section 2 text 2 seconds after section 1 text appears
+      setTimeout(() => {
+        setShowSection2Text(true)
+      }, 1000)
     }
   }, [animationProgress])
 

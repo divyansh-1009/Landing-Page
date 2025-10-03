@@ -191,6 +191,17 @@
   .section-2-text {
     font-size: 2rem;
   }
+  
+  /* Reduce Section 1 height on mobile devices */
+  #section-1 {
+    min-height: 70vh; /* 70% of viewport height on mobile */
+    height: 70vh;
+  }
+  
+  /* Position rectangles at 70% height on mobile */
+  .rectangles-container {
+    top: 70%;
+  }
 }
 
 /* Section 2 - Transition Background */
@@ -1052,8 +1063,8 @@
   
   /* Specific adjustments for Section 1 in portrait */
   #section-1 {
-    min-height: 100vh;
-    height: 100vh; /* Force exact viewport height */
+    min-height: 70vh; /* Reduced to 70% of viewport height */
+    height: 70vh; /* Force exact 70% viewport height */
     padding: 0;
   }
   
@@ -1100,7 +1111,7 @@
   
   /* Optimize rectangles positioning for portrait mode */
   .rectangles-container {
-    top: 50%; /* Center the rectangles vertically in Section 1 for portrait mode */
+    top: 70%; /* Position at 70% height from top in mobile view */
     height: 70px;
   }
   
