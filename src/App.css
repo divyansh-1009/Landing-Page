@@ -148,14 +148,15 @@
   margin: 0;
   animation: fadeIn 1s ease-in-out forwards;
   opacity: 0;
-  transition: all 0.2s ease-out;
+  /* Removed transition to prevent conflicts with JS animations */
   transform-origin: left center;
   position: relative;
   flex-shrink: 0;
-}
-
-.rectangle.selected {
-  transition: all 0.15s ease-out;
+  flex-grow: 0;
+  /* Ensure no margin or padding interferes */
+  padding: 0;
+  border: none;
+  outline: none;
 }
 
 @keyframes fadeIn {
@@ -1228,9 +1229,9 @@
     hyphens: auto;
   }
   
-  /* Optimize rectangles positioning for portrait mode */
+  /* Optimize rectangles positioning for portrait mode - keep centered */
   .rectangles-container {
-    top: 70%; /* Position at 70% height from top in mobile view */
+    top: 50%; /* Center the rectangles vertically in Section 1 for mobile */
     height: 70px;
   }
   

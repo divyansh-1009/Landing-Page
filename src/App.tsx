@@ -517,62 +517,59 @@ function App() {
       
       <section className="section-full" id="section-1" ref={section1Ref}>
         <div className="rectangles-container">
-          {(() => {
-            const selectedColorValue = selectedRectIndex !== null 
-              ? Math.round((selectedRectIndex / 19) * 255)
-              : 0
-            const selectedBackgroundColor = `rgb(${selectedColorValue}, ${selectedColorValue}, ${selectedColorValue})`
+          {Array.from({ length: 20 }, (_, index) => {
+            const isSelected = index === selectedRectIndex
             
-            return Array.from({ length: 20 }, (_, index) => {
-              const isSelected = index === selectedRectIndex
-              const opacity = 1 - animationProgress * (isSelected ? 0 : 1)
-              
-              let backgroundColor: string
-              if (animationProgress > 0 && selectedRectIndex !== null) {
-                backgroundColor = selectedBackgroundColor
-              } else {
-                const colorValue = Math.round((index / 19) * 255)
-                backgroundColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`
-              }
-              
-              const baseStyle: React.CSSProperties = {
-                backgroundColor,
-                opacity,
-                filter: isSelected && animationProgress === 0 
-                  ? `drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))`
-                  : 'none',
-                zIndex: isSelected ? 10 : 1,
-                // Disable transitions during scroll animation to prevent jerky movement
-                transition: animationProgress > 0 ? 'none' : undefined,
-              }
-              
-              let style = baseStyle
-              
-              if (isSelected && animationProgress > 0) {
-                // Calculate how much wider the selected rectangle should become
-                const baseWidth = 5 // Each rectangle is 5vw (100vw / 20)
-                const maxWidth = 100 // Full viewport width
-                const currentWidth = baseWidth + (maxWidth - baseWidth) * animationProgress
-                
-                style = {
-                  ...baseStyle,
-                  width: `${currentWidth}vw`,
-                  transition: 'none', // Disable transitions during animation
-                  position: 'absolute',
-                  left: `${index * baseWidth}vw`, // Keep it in original position
-                  zIndex: 10
-                }
-              }
-              
-              return (
-                <div
-                  key={index}
-                  className={`rectangle ${isSelected ? 'selected' : ''}`}
-                  style={style}
-                />
-              )
-            })
-          })()}
+            // Calculate colors
+            let backgroundColor: string
+            if (animationProgress > 0 && selectedRectIndex !== null) {
+              // During animation, all rectangles get the selected color
+              const selectedColorValue = Math.round((selectedRectIndex / 19) * 255)
+              backgroundColor = `rgb(${selectedColorValue}, ${selectedColorValue}, ${selectedColorValue})`
+            } else {
+              // Initial state: each rectangle has its own color
+              const colorValue = Math.round((index / 19) * 255)
+              backgroundColor = `rgb(${colorValue}, ${colorValue}, ${colorValue})`
+            }
+            
+            // Calculate opacity - non-selected rectangles fade out during animation
+            const opacity = animationProgress > 0 && !isSelected ? 1 - animationProgress : 1
+            
+            // Calculate width based on animation progress
+            let width: string
+            if (isSelected && animationProgress > 0) {
+              // Selected rectangle expands to take the space of faded rectangles
+              const baseWidth = 100 / 20 // 5vw per rectangle
+              const fadeOutRectangles = 19 // All other rectangles
+              const additionalWidth = fadeOutRectangles * baseWidth * animationProgress
+              width = `${baseWidth + additionalWidth}vw`
+            } else {
+              // Normal width for all rectangles
+              width = `${100 / 20}vw` // 5vw each
+            }
+            
+            const style: React.CSSProperties = {
+              backgroundColor,
+              opacity,
+              width,
+              height: '80px',
+              position: 'relative',
+              flexShrink: 0,
+              transition: 'none', // Disable CSS transitions during JS animation
+              filter: isSelected && animationProgress === 0 
+                ? 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))'
+                : 'none',
+              zIndex: isSelected ? 10 : 1,
+            }
+            
+            return (
+              <div
+                key={index}
+                className={`rectangle ${isSelected ? 'selected' : ''}`}
+                style={style}
+              />
+            )
+          })}
           
           {showText && (
             <div className="overlay-text" style={{ color: section1TextColor }}>
@@ -718,8 +715,9 @@ function App() {
       <footer className="site-footer">
         <div className="footer-content">
           <div className="footer-links">
-            <a href="#" className="footer-link">Terms of Conditions</a>
-            <a href="#" className="footer-link">Cookies Policy</a>
+            <a href="/terms-of-conditions.html" className="footer-link">Terms of Conditions</a>
+            <a href="/privacy-policy.html" className="footer-link">Privacy Policy</a>
+            <a href="/cookies-policy.html" className="footer-link">Cookies Policy</a>
           </div>
           <div className="footer-copyright">
             <span>© 2025 Grey Entropy Research. All rights reserved.</span>
