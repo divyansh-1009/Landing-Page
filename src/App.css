@@ -3,6 +3,111 @@
   min-height: 400vh; /* Reduced from 600vh to 400vh (4 sections total) */
 }
 
+/* Header */
+.site-header {
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 80px;
+  background: rgba(0, 0, 0, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.site-title {
+  color: #ffffff;
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: 'Arial', sans-serif;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+}
+
+/* Footer */
+.site-footer {
+  background: #000000;
+  color: #ffffff;
+  padding: 2rem 0 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+  margin-bottom: 1rem;
+}
+
+.footer-link {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.9rem;
+  transition: color 0.3s ease;
+  opacity: 0.8;
+}
+
+.footer-link:hover {
+  color: #3b82f6;
+  opacity: 1;
+}
+
+.footer-copyright {
+  font-size: 0.8rem;
+  opacity: 0.6;
+  text-align: center;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .site-header {
+    height: 70px;
+  }
+  
+  .site-title {
+    font-size: 1.4rem;
+    letter-spacing: 0.5px;
+  }
+  
+  .footer-links {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .footer-content {
+    padding: 0 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .site-title {
+    font-size: 1.2rem;
+  }
+  
+  .footer-links {
+    gap: 0.8rem;
+  }
+  
+  .footer-link {
+    font-size: 0.85rem;
+  }
+}
+
 /* Section styling */
 .section-full {
   min-height: 100vh;
@@ -25,7 +130,7 @@
 
 .rectangles-container {
   position: absolute;
-  top: 70%;
+  top: 52.5%; /* Changed from 70% to 75% of 70% (52.5%) */
   left: 0;
   width: 100vw;
   height: 80px;
@@ -898,6 +1003,13 @@
   #section-2 {
     min-height: 60vh; /* Reduced to 60% of viewport height */
     height: 60vh; /* Force exact 60% viewport height */
+    padding: 1rem;
+  }
+  
+  /* Specific adjustments for Section 4 - Reduce height to 40% */
+  #section-4 {
+    min-height: 40vh; /* Reduced to 40% of viewport height */
+    height: 40vh; /* Force exact 40% viewport height */
     padding: 1rem;
   }
   

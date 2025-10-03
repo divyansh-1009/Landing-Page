@@ -510,6 +510,11 @@ function App() {
 
   return (
     <div className="app-container">
+      {/* Header */}
+      <header className="site-header">
+        <h1 className="site-title">Grey Entropy Research</h1>
+      </header>
+      
       <section className="section-full" id="section-1" ref={section1Ref}>
         <div className="rectangles-container">
           {(() => {
@@ -537,20 +542,25 @@ function App() {
                   ? `drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))`
                   : 'none',
                 zIndex: isSelected ? 10 : 1,
+                // Disable transitions during scroll animation to prevent jerky movement
+                transition: animationProgress > 0 ? 'none' : undefined,
               }
               
               let style = baseStyle
               
               if (isSelected && animationProgress > 0) {
-                const finalWidth = 100
-                const currentWidth = 100 / 20
-                const widthScale = (finalWidth / currentWidth) * animationProgress
-                const leftOffset = -(index * currentWidth) * animationProgress
+                // Calculate how much wider the selected rectangle should become
+                const baseWidth = 5 // Each rectangle is 5vw (100vw / 20)
+                const maxWidth = 100 // Full viewport width
+                const currentWidth = baseWidth + (maxWidth - baseWidth) * animationProgress
                 
                 style = {
                   ...baseStyle,
-                  transform: `translateX(${leftOffset}vw) scaleX(${1 + (widthScale - 1)})`,
-                  width: `${currentWidth}vw`
+                  width: `${currentWidth}vw`,
+                  transition: 'none', // Disable transitions during animation
+                  position: 'absolute',
+                  left: `${index * baseWidth}vw`, // Keep it in original position
+                  zIndex: 10
                 }
               }
               
@@ -703,6 +713,19 @@ function App() {
           )}
         </div>
       </section>
+      
+      {/* Footer */}
+      <footer className="site-footer">
+        <div className="footer-content">
+          <div className="footer-links">
+            <a href="#" className="footer-link">Terms of Conditions</a>
+            <a href="#" className="footer-link">Cookies Policy</a>
+          </div>
+          <div className="footer-copyright">
+            <span>© 2025 Grey Entropy Research. All rights reserved.</span>
+          </div>
+        </div>
+      </footer>
     </div>
   )
 }
