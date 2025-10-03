@@ -596,7 +596,8 @@ function App() {
           <div className="dots-grid" ref={dotsGridRef}>
             {dots.map((dot) => {
               const isConnected = connectedDots.some(d => d.row === dot.row && d.col === dot.col)
-              const isHighlighted = highlightedDot?.row === dot.row && highlightedDot?.col === dot.col
+              // Only highlight the dot if the path is complete (progress >= 0.25) and central dot hasn't started moving (progress < 0.35)
+              const isHighlighted = highlightedDot?.row === dot.row && highlightedDot?.col === dot.col && currentProgress >= 0.25 && currentProgress < 0.35
               
               return (
                 <div
