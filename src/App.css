@@ -253,14 +253,16 @@
 
 /* Section 2 - Conditional Text */
 .section-2-content {
-  position: absolute;
-  top: 50%; /* Center vertically for better mobile experience */
-  left: 50%;
-  transform: translate(-50%, -50%);
+  position: static; /* Change from absolute to static */
+  transform: none; /* Remove transform since we're not centering absolutely */
   width: 100%;
   text-align: center;
   padding: 0 20px;
   box-sizing: border-box;
+  min-height: 120px; /* Reserve space for text even when opacity is 0 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .section-2-text {
@@ -285,9 +287,32 @@
   }
 }
 
+/* Responsive breakpoints for better rectangle positioning */
+@media (max-width: 1024px) {
+  .rectangles-container {
+    top: 60%; /* Position higher on smaller desktop screens */
+  }
+}
+
 @media (max-width: 768px) {
   .section-2-text {
     font-size: 2.1rem; /* Reduced from 2.5rem */
+  }
+  
+  /* Tablet adjustments for Section 1 */
+  #section-1 {
+    min-height: 80vh; /* Slightly reduced for tablets */
+  }
+  
+  /* Position rectangles closer to bottom on tablets */
+  .rectangles-container {
+    top: 75%; /* Position at 75% on tablets */
+  }
+  
+  /* Optimize section 2 for tablets */
+  #section-2 {
+    padding: 2.5rem 1.5rem; /* Reduce padding for tablets */
+    min-height: 180px; /* Smaller fixed height for tablets */
   }
 }
 
@@ -296,15 +321,23 @@
     font-size: 1.7rem; /* Reduced from 2rem */
   }
   
-  /* Reduce Section 1 height on mobile devices */
+  /* Adjust Section 1 height so rectangles end up in viewport center */
   #section-1 {
-    min-height: 70vh; /* 70% of viewport height on mobile */
-    height: 70vh;
+    min-height: 54vh; /* 54% of viewport height on mobile */
+    height: 54vh;
   }
   
-  /* Position rectangles at 70% height on mobile */
+  /* Position rectangles at the bottom of section 1 on mobile - this puts them at ~50vh (center) */
   .rectangles-container {
-    top: 70%;
+    top: auto;
+    bottom: 4vh; /* 4vh from bottom of section 1 = 50vh from top of viewport */
+    transform: none; /* Remove the centering transform */
+  }
+  
+  /* Optimize section 2 for mobile */
+  #section-2 {
+    padding: 2rem 1rem; /* Reduce padding for mobile */
+    min-height: 160px; /* Smaller fixed height for mobile */
   }
   
   /* Trim section 3 height from top on mobile */
@@ -320,6 +353,14 @@
 /* Section 2 - Transition Background */
 #section-2 {
   background: linear-gradient(180deg, #000000 0%, #1a1a1a 100%);
+  min-height: 200px; /* Fixed minimum height to accommodate text */
+  height: auto; /* Allow height to grow if needed */
+  padding: 3rem 2rem; /* Add padding for breathing room */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Override default section-full styles */
+  flex-direction: row; /* Override column from section-full */
 }
 
 /* Merged Section 3-5 - Scroll-jacking Section */
@@ -1002,9 +1043,8 @@
   
   /* Specific adjustments for Section 2 */
   #section-2 {
-    min-height: 60vh; /* Reduced to 60% of viewport height */
-    height: 60vh; /* Force exact 60% viewport height */
-    padding: 1rem;
+    padding: 2rem 1rem; /* Minimal padding, auto height */
+    min-height: 160px; /* Fixed height for consistency */
   }
   
   /* Specific adjustments for Section 4 - Reduce height to 40% */
@@ -1057,13 +1097,13 @@
   }
   
   /* Mobile optimization for Section 2 text */
-  .section-2-content {
-    top: 50%; /* Ensure section 2 content is centered on mobile */
-  }
-  
   .section-2-text {
     font-size: 1.8rem; /* Slightly larger for better mobile readability */
     line-height: 1.3; /* Better line spacing for mobile */
+  }
+  
+  .section-2-content {
+    min-height: 100px; /* Smaller reserved space for mobile */
   }
 
   .overlay-text p {
@@ -1079,9 +1119,11 @@
     content: none; /* Remove extra space */
   }
   
-  /* Adjust rectangle container for mobile - keep centered */
+  /* Adjust rectangle container for mobile - position at bottom of section 1 */
   .rectangles-container {
-    top: 50%; /* Center the rectangles vertically in Section 1 */
+    top: auto; /* Remove top positioning */
+    bottom: 4vh; /* Position 4vh from bottom of section 1 = 50vh from top (center) */
+    transform: none; /* Remove the centering transform */
     height: 80px;
   }
   
@@ -1169,6 +1211,25 @@
   }
 }
 
+/* Landscape mobile orientation adjustments */
+@media (max-width: 768px) and (orientation: landscape) {
+  #section-1 {
+    min-height: 54vh; /* Consistent with portrait mode */
+    height: 54vh;
+  }
+  
+  .rectangles-container {
+    top: auto;
+    bottom: 4vh; /* Same positioning as portrait for center alignment */
+    transform: none;
+    height: 70px; /* Slightly smaller height for landscape */
+  }
+  
+  .rectangle {
+    height: 70px;
+  }
+}
+
 /* Portrait mode specific adjustments for mobile */
 @media (max-width: 480px) and (orientation: portrait) {
   /* Optimize for portrait mode single-scroll sections */
@@ -1183,16 +1244,15 @@
   
   /* Specific adjustments for Section 1 in portrait */
   #section-1 {
-    min-height: 70vh; /* Reduced to 70% of viewport height */
-    height: 70vh; /* Force exact 70% viewport height */
+    min-height: 54vh; /* Adjusted to 54% of viewport height */
+    height: 54vh; /* Force exact 54% viewport height */
     padding: 0;
   }
   
   /* Specific adjustments for Section 2 in portrait */
   #section-2 {
-    min-height: 60vh; /* Reduced to 60% of viewport height */
-    height: 60vh; /* Force exact 60% viewport height */
-    padding: 0.8rem;
+    padding: 1.5rem 1rem; /* Compact padding for portrait mode */
+    min-height: 140px; /* Fixed height for portrait consistency */
   }
   
   .overlay-text {
@@ -1209,13 +1269,13 @@
   }
   
   /* Portrait mode Section 2 text optimization */
-  .section-2-content {
-    top: 50%; /* Keep centered in portrait mode */
-  }
-  
   .section-2-text {
     font-size: 1.6rem; /* Optimized for portrait mobile */
     line-height: 1.25; /* Better spacing for portrait */
+  }
+  
+  .section-2-content {
+    min-height: 80px; /* Smallest reserved space for portrait */
   }
 
   /* Make the text wrap properly for portrait mode */
@@ -1229,9 +1289,11 @@
     hyphens: auto;
   }
   
-  /* Optimize rectangles positioning for portrait mode - keep centered */
+  /* Position rectangles at bottom of section 1 for portrait mode */
   .rectangles-container {
-    top: 50%; /* Center the rectangles vertically in Section 1 for mobile */
+    top: auto; /* Remove top positioning */
+    bottom: 4vh; /* Position 4vh from bottom of section 1 = 50vh from top (center) */
+    transform: none; /* Remove the centering transform */
     height: 70px;
   }
   
