@@ -121,6 +121,17 @@
   box-sizing: border-box;
 }
 
+/* Ensure sections don't overlap on mobile */
+@media (max-width: 768px) {
+  .section-full {
+    margin-bottom: 0; /* Remove any bottom margins that might cause gaps */
+  }
+  
+  .section-full + .section-full {
+    margin-top: 0; /* Ensure no negative margins between sections */
+  }
+}
+
 /* Section 1 - Rectangles Animation */
 #section-1 {
   background: #000000;
@@ -325,6 +336,7 @@
   #section-1 {
     min-height: 54vh; /* 54% of viewport height on mobile */
     height: 54vh;
+    margin-bottom: 0; /* Ensure no extra bottom margin */
   }
   
   /* Position rectangles at the bottom of section 1 on mobile - this puts them at ~50vh (center) */
@@ -338,15 +350,17 @@
   #section-2 {
     padding: 2rem 1rem; /* Reduce padding for mobile */
     min-height: 160px; /* Smaller fixed height for mobile */
+    margin-top: 0; /* Ensure no negative margin causing overlap */
   }
   
-  /* Trim section 3 height from top on mobile */
+  /* Optimize section 3 for mobile - remove overlap-causing negative margin */
   .merged-section {
     padding-top: 0; /* Remove top padding */
+    margin-top: 0; /* Ensure no negative margin */
   }
   
   #section-3 {
-    margin-top: -10vh; /* Pull section 3 up by 10% of viewport height */
+    margin-top: 0; /* Remove negative margin to prevent overlap */
   }
 }
 
@@ -1184,9 +1198,9 @@
     padding: 18px 20px;
   }
   
-  /* Improve vertical flow and reduce gaps between sections */
+  /* Improve vertical flow between sections */
   .section-full + .section-full {
-    margin-top: -14vh; /* Increased negative margin to further reduce space between consecutive sections */
+    margin-top: 0; /* Remove negative margin to prevent overlap */
   }
   
   .merged-section {
@@ -1216,6 +1230,11 @@
   #section-1 {
     min-height: 54vh; /* Consistent with portrait mode */
     height: 54vh;
+    margin-bottom: 0; /* Ensure no bottom margin */
+  }
+  
+  #section-2 {
+    margin-top: 0; /* Prevent overlap with section 1 */
   }
   
   .rectangles-container {
@@ -1238,7 +1257,7 @@
   }
   
   .section-full {
-    min-height: 100vh; /* Each section takes full viewport height */
+    min-height: auto; /* Remove fixed viewport height to prevent overlaps */
     padding: 0.8rem;
   }
   
@@ -1247,12 +1266,14 @@
     min-height: 54vh; /* Adjusted to 54% of viewport height */
     height: 54vh; /* Force exact 54% viewport height */
     padding: 0;
+    margin-bottom: 0; /* Ensure no bottom margin */
   }
   
   /* Specific adjustments for Section 2 in portrait */
   #section-2 {
     padding: 1.5rem 1rem; /* Compact padding for portrait mode */
     min-height: 140px; /* Fixed height for portrait consistency */
+    margin-top: 0; /* Ensure no overlap with section 1 */
   }
   
   .overlay-text {
