@@ -159,7 +159,9 @@
   margin: 0;
   animation: fadeIn 1s ease-in-out forwards;
   opacity: 0;
-  /* Removed transition to prevent conflicts with JS animations */
+  /* Enable smooth transitions for color and opacity changes */
+  transition: background-color 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+              opacity 0.15s cubic-bezier(0.4, 0, 0.2, 1);
   transform-origin: left center;
   position: relative;
   flex-shrink: 0;
@@ -168,6 +170,15 @@
   padding: 0;
   border: none;
   outline: none;
+  /* Enable hardware acceleration for smoother transitions */
+  will-change: background-color, opacity, width;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+/* Disable CSS transitions when JavaScript is controlling the animation */
+.rectangle.js-animated {
+  transition: none;
 }
 
 @keyframes fadeIn {

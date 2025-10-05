@@ -490,6 +490,48 @@ function App() {
 
   const animationProgress = getAnimationProgress()
 
+  // Add smooth transition states
+  const [smoothAnimationProgress, setSmoothAnimationProgress] = useState(0)
+  const [isAnimating, setIsAnimating] = useState(false)
+
+  // Smooth animation effect
+  useEffect(() => {
+    let animationFrame: number
+
+    const smoothTransition = () => {
+      setSmoothAnimationProgress(prev => {
+        const target = animationProgress
+        const difference = target - prev
+        
+        // If the difference is very small, snap to target
+        if (Math.abs(difference) < 0.001) {
+          setIsAnimating(false)
+          return target
+        }
+        
+        // Use easing function for smooth transition
+        const easeSpeed = 0.05 // Slower transition for more noticeable smooth effect (lower = slower)
+        const newValue = prev + (difference * easeSpeed)
+        
+        if (!isAnimating && Math.abs(difference) > 0.001) {
+          setIsAnimating(true)
+        }
+        
+        return newValue
+      })
+      
+      animationFrame = requestAnimationFrame(smoothTransition)
+    }
+    
+    animationFrame = requestAnimationFrame(smoothTransition)
+    
+    return () => {
+      if (animationFrame) {
+        cancelAnimationFrame(animationFrame)
+      }
+    }
+  }, [animationProgress, isAnimating])
+
   // Dynamic contrasting text color for Section 1 overlay text
   const section1TextColor = (() => {
     if (selectedRectIndex === null) return '#ffffff'
@@ -499,14 +541,14 @@ function App() {
 
   // Show text when animation is about 50% complete
   useEffect(() => {
-    if (animationProgress > 0.5) {
+    if (smoothAnimationProgress > 0.5) {
       setShowText(true)
       // Trigger section 2 text 2 seconds after section 1 text appears
       setTimeout(() => {
         setShowSection2Text(true)
       }, 1000)
     }
-  }, [animationProgress])
+  }, [smoothAnimationProgress])
 
   return (
     <div className="app-container">
@@ -520,12 +562,18 @@ function App() {
           {Array.from({ length: 20 }, (_, index) => {
             const isSelected = index === selectedRectIndex
             
-            // Calculate colors
+            // Calculate colors with smooth blending
             let backgroundColor: string
-            if (animationProgress > 0 && selectedRectIndex !== null) {
-              // During animation, all rectangles get the selected color
+            if (smoothAnimationProgress > 0 && selectedRectIndex !== null) {
+              // During animation, gradually blend each rectangle's color towards the selected color
+              const originalColorValue = Math.round((index / 19) * 255)
               const selectedColorValue = Math.round((selectedRectIndex / 19) * 255)
-              backgroundColor = `rgb(${selectedColorValue}, ${selectedColorValue}, ${selectedColorValue})`
+              
+              // Smooth interpolation between original and target color
+              const blendedColorValue = Math.round(
+                originalColorValue + (selectedColorValue - originalColorValue) * smoothAnimationProgress
+              )
+              backgroundColor = `rgb(${blendedColorValue}, ${blendedColorValue}, ${blendedColorValue})`
             } else {
               // Initial state: each rectangle has its own color
               const colorValue = Math.round((index / 19) * 255)
@@ -533,15 +581,15 @@ function App() {
             }
             
             // Calculate opacity - non-selected rectangles fade out during animation
-            const opacity = animationProgress > 0 && !isSelected ? 1 - animationProgress : 1
+            const opacity = smoothAnimationProgress > 0 && !isSelected ? 1 - smoothAnimationProgress : 1
             
             // Calculate width based on animation progress
             let width: string
-            if (isSelected && animationProgress > 0) {
+            if (isSelected && smoothAnimationProgress > 0) {
               // Selected rectangle expands to take the space of faded rectangles
               const baseWidth = 100 / 20 // 5vw per rectangle
               const fadeOutRectangles = 19 // All other rectangles
-              const additionalWidth = fadeOutRectangles * baseWidth * animationProgress
+              const additionalWidth = fadeOutRectangles * baseWidth * smoothAnimationProgress
               width = `${baseWidth + additionalWidth}vw`
             } else {
               // Normal width for all rectangles
@@ -555,17 +603,18 @@ function App() {
               height: '80px',
               position: 'relative',
               flexShrink: 0,
-              transition: 'none', // Disable CSS transitions during JS animation
-              filter: isSelected && animationProgress === 0 
+              filter: isSelected && smoothAnimationProgress === 0 
                 ? 'drop-shadow(0 0 20px rgba(255, 255, 255, 0.6))'
                 : 'none',
               zIndex: isSelected ? 10 : 1,
             }
             
+            const className = `rectangle ${isSelected ? 'selected' : ''} ${isAnimating ? 'js-animated' : ''}`
+            
             return (
               <div
                 key={index}
-                className={`rectangle ${isSelected ? 'selected' : ''}`}
+                className={className}
                 style={style}
               />
             )
