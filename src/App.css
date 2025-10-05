@@ -325,6 +325,15 @@
     padding: 2.5rem 1.5rem; /* Reduce padding for tablets */
     min-height: 180px; /* Smaller fixed height for tablets */
   }
+  
+  /* Optimize section 4 for tablets */
+  #section-4 {
+    padding: 2.5rem 1.5rem; /* Reduce padding for tablets */
+  }
+  
+  .section-4-container {
+    min-height: 110px; /* Slightly bigger than mobile but still compact */
+  }
 }
 
 @media (max-width: 480px) {
@@ -553,16 +562,23 @@
 #section-4 {
   background: linear-gradient(180deg, #808080 0%, #ffffff 100%);
   overflow: hidden;
+  min-height: auto; /* Remove fixed viewport height */
+  height: auto; /* Allow height to be determined by content */
+  padding: 3rem 2rem; /* Add minimal padding for form */
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .section-4-container {
-  position: relative;
+  position: static; /* Change from relative to static for content-based sizing */
   width: 100%;
-  height: 100%;
+  height: auto; /* Allow height to be determined by content */
   display: flex;
   align-items: center;
   justify-content: center;
   flex-direction: column;
+  min-height: 120px; /* Reserve minimal space for form */
 }
 
 .section-4-bottom {
@@ -1002,6 +1018,15 @@
   .form-input {
     width: 250px;
     font-size: 1rem;
+    padding: 12px 16px; /* Slightly reduce padding for mobile */
+  }
+  
+  .form-arrow {
+    padding: 12px 16px; /* Match input padding */
+  }
+  
+  .form-input-container {
+    margin: 0; /* Remove any extra margins */
   }
   
   .typed-message {
@@ -1061,11 +1086,15 @@
     min-height: 160px; /* Fixed height for consistency */
   }
   
-  /* Specific adjustments for Section 4 - Reduce height to 40% */
+  /* Specific adjustments for Section 4 - Optimize for form content only */
   #section-4 {
-    min-height: 40vh; /* Reduced to 40% of viewport height */
-    height: 40vh; /* Force exact 40% viewport height */
-    padding: 1rem;
+    padding: 2rem 1rem; /* Minimal padding for mobile */
+    min-height: auto; /* Remove fixed height constraint */
+    height: auto; /* Allow content-based height */
+  }
+  
+  .section-4-container {
+    min-height: 100px; /* Even smaller reserved space for mobile */
   }
   
   /* Control spacing for GSAP ScrollTrigger */
@@ -1297,6 +1326,16 @@
   
   .section-2-content {
     min-height: 80px; /* Smallest reserved space for portrait */
+  }
+
+  /* Specific adjustments for Section 4 in portrait */
+  #section-4 {
+    padding: 1.5rem 1rem; /* Compact padding for portrait mode */
+    margin-top: 0; /* Ensure no overlap */
+  }
+  
+  .section-4-container {
+    min-height: 90px; /* Minimal space for portrait */
   }
 
   /* Make the text wrap properly for portrait mode */
