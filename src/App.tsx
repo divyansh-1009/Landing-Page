@@ -3,6 +3,7 @@ import Typed from 'typed.js'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import Lenis from 'lenis'
+import { googleSheetsService, type FormData } from './services/googleSheets'
 import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
@@ -457,26 +458,60 @@ function App() {
   }, [showFinalMessage])
 
   // Form handling
-  const handleFormSubmit = (e: React.FormEvent) => {
+  const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    // Update form step with the current input value
+    const updatedStep = { ...formSteps[currentFormStep], completed: true, value: formInputValue };
+    const updatedFormSteps = formSteps.map((step, index) => 
+      index === currentFormStep ? updatedStep : step
+    );
+    
+    setFormSteps(updatedFormSteps);
+    
     if (currentFormStep < formSteps.length - 1) {
-      setFormSteps(prev => 
-        prev.map((step, index) => 
-          index === currentFormStep 
-            ? { ...step, completed: true, value: formInputValue }
-            : step
-        )
-      )
       setCurrentFormStep(prev => prev + 1)
       setFormInputValue("")
     } else {
-      setFormSteps(prev => 
-        prev.map((step, index) => 
-          index === currentFormStep 
-            ? { ...step, completed: true, value: formInputValue }
-            : step
-        )
-      )
+      // This is the last step, save all data to Google Sheets
+      const completeFormData: FormData = {
+        website: updatedFormSteps[0].value,
+        companyName: updatedFormSteps[1].value,
+        userName: updatedFormSteps[2].value,
+        userRole: updatedFormSteps[3].value,
+        email: updatedFormSteps[4].value,
+        contactNumber: updatedFormSteps[5].value,
+        timestamp: new Date().toISOString()
+      };
+      
+      console.log('Form completed! Attempting to save to Google Sheets...');
+      console.log('Form data to save:', completeFormData);
+      
+      try {
+        // Test connection first
+        console.log('Testing Google Sheets connection...');
+        const connectionTest = await googleSheetsService.testConnection();
+        
+        if (!connectionTest) {
+          console.error('Connection test failed. Please check your Google Sheets configuration.');
+          alert('Failed to connect to Google Sheets. Please check the console for details.');
+        } else {
+          console.log('Connection test passed. Saving data...');
+          const success = await googleSheetsService.appendToSheet(completeFormData);
+          
+          if (success) {
+            console.log('✅ Form data successfully saved to Google Sheets');
+            // Optionally show success message to user
+          } else {
+            console.error('❌ Failed to save form data to Google Sheets');
+            alert('Failed to save data to Google Sheets. Please check the console for details.');
+          }
+        }
+      } catch (error) {
+        console.error('❌ Error saving to Google Sheets:', error);
+        alert('An error occurred while saving to Google Sheets. Please check the console for details.');
+      }
+      
       setShowFinalMessage(true)
     }
   }
