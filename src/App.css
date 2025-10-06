@@ -1,9 +1,8 @@
 .app-container {
   position: relative;
-  min-height: 400vh; /* Reduced from 600vh to 400vh (4 sections total) */
+  min-height: 400vh;
 }
 
-/* Header */
 .site-header {
   position: relative;
   top: 0;

@@ -1,4 +1,3 @@
-// tailwind.config.cjs  (or tailwind.config.js — use the file you have)
 module.exports = {
   content: [
     "./index.html",

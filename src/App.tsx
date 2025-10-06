@@ -8,7 +8,6 @@ import './App.css'
 
 gsap.registerPlugin(ScrollTrigger)
 
-// Dot interface for the merged section
 interface Dot {
   id: string
   row: number
@@ -17,7 +16,6 @@ interface Dot {
   isHighlighted: boolean
 }
 
-// Form step interface for section 6
 interface FormStep {
   id: number
   placeholder: string
@@ -31,7 +29,6 @@ function App() {
   const [showText, setShowText] = useState(false)
   const [showSection2Text, setShowSection2Text] = useState(false)
   
-  // Merged section states
   const [dots, setDots] = useState<Dot[]>([])
   const [fullPath, setFullPath] = useState<number[]>([])
     const [connectedDots, setConnectedDots] = useState<{ row: number; col: number }[]>([])
@@ -39,7 +36,6 @@ function App() {
   const [highlightedDot, setHighlightedDot] = useState<{ row: number, col: number } | null>(null)
   const [smallDots, setSmallDots] = useState<Array<{ id: number, angle: number, color: string, absorbed: boolean }>>([])
   
-  // Form states for section 4 (formerly 6)
   const [formSteps, setFormSteps] = useState<FormStep[]>([
     { id: 1, placeholder: "Your company's website.", completed: false, value: "" },
     { id: 2, placeholder: "Your company's name.", completed: false, value: "" },
@@ -52,7 +48,6 @@ function App() {
   const [showFinalMessage, setShowFinalMessage] = useState(false)
   const [formInputValue, setFormInputValue] = useState("")
   
-  // Refs
   const section1Ref = useRef<HTMLElement>(null)
   const section4Ref = useRef<HTMLElement>(null)
   const mergedSectionRef = useRef<HTMLElement>(null)
@@ -62,7 +57,6 @@ function App() {
   const typedElementRef = useRef<HTMLDivElement>(null)
   const typedInstanceRef = useRef<Typed | null>(null)
   
-  // Animation state refs
   const animationStateRef = useRef<{
     pathComplete: boolean
     dotCentered: boolean
@@ -77,7 +71,6 @@ function App() {
     dotsAbsorbed: false
   })
 
-  // Lenis smooth scroll setup
   useEffect(() => {
     const lenis = new Lenis({
       duration: 1.2,

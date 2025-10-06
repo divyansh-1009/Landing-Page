@@ -20,7 +20,6 @@ class GoogleSheetsService {
     this.webAppUrl = import.meta.env.VITE_GOOGLE_WEB_APP_URL || '';
   }
 
-  // Method using Google Apps Script Web App (recommended for client-side)
   async appendToSheetViaWebApp(formData: FormData): Promise<boolean> {
     try {
       if (!this.webAppUrl) {
@@ -28,7 +27,6 @@ class GoogleSheetsService {
         return false;
       }
 
-      // Use a simple GET request with URL parameters to avoid CORS preflight
       const params = new URLSearchParams({
         timestamp: formData.timestamp,
         website: formData.website,
@@ -44,11 +42,9 @@ class GoogleSheetsService {
 
       await fetch(url, {
         method: 'GET',
-        mode: 'no-cors' // This bypasses CORS but we won't get response details
+        mode: 'no-cors'
       });
 
-      // Since we're using no-cors, we can't read the response
-      // We'll assume success if no error was thrown
       console.log('Data sent to Google Apps Script Web App');
       return true;
     } catch (error) {
@@ -57,7 +53,6 @@ class GoogleSheetsService {
     }
   }
 
-  // Alternative method using Sheets API directly (may have CORS issues)
   async appendToSheetDirectAPI(formData: FormData): Promise<boolean> {
     try {
       if (!this.spreadsheetId || !this.apiKey) {
@@ -65,7 +60,6 @@ class GoogleSheetsService {
         return false;
       }
 
-      // First, let's try to make the sheet publicly editable or check permissions
       const values = [
         [
           formData.timestamp,

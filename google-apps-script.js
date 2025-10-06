@@ -1,6 +1,5 @@
 function doPost(e) {
   try {
-    // Parse the JSON data from the request
     const data = JSON.parse(e.postData.contents);
     return saveToSheet(data);
   } catch (error) {
@@ -15,7 +14,6 @@ function doPost(e) {
 
 function doGet(e) {
   try {
-    // Handle GET requests with URL parameters (to avoid CORS issues)
     if (e.parameter && e.parameter.action === 'submit') {
       const data = {
         timestamp: e.parameter.timestamp || new Date().toISOString(),
@@ -45,16 +43,13 @@ function doGet(e) {
 
 function saveToSheet(data) {
   try {
-    // Open your specific spreadsheet
     const spreadsheetId = '18Cuzdl0cbbWmbgqTtLZiZF0dH56wgYksHqE4dvpxWMg';
     const sheet = SpreadsheetApp.openById(spreadsheetId).getActiveSheet();
     
-    // Add headers if the sheet is empty
     if (sheet.getLastRow() === 0) {
       sheet.appendRow(['Timestamp', 'Website', 'Company Name', 'User Name', 'User Role', 'Email', 'Contact Number']);
     }
     
-    // Append the form data
     sheet.appendRow([
       data.timestamp,
       data.website,
